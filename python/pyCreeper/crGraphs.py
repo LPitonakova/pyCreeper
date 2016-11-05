@@ -26,7 +26,7 @@ INVALID_VALUE = -999999;
 #
 def createPieChart(data_=[], itemLabels_=[], itemColors_=[],
                     title_="", showActualVals_=True, showPercentageVals_=False, showShadow_=False,
-                    titleFontSize_=INVALID_VALUE, itemsFontSize_= INVALID_VALUE, valuesFontSize_=INVALID_VALUE, size_=(8,6),
+                    titleFontSize_=INVALID_VALUE, itemsFontSize_= INVALID_VALUE, valuesFontSize_=INVALID_VALUE, size_=(6,6),
                     filePath_ = "", holdFigure_=False, figure_=None, subPlot_=111):
     """
 
@@ -76,7 +76,7 @@ def createPieChart(data_=[], itemLabels_=[], itemColors_=[],
         fig.suptitle(title_, fontsize=titleFontSize_)
     else:
         box = ax.get_position();
-        ax.set_position([box.x0 - box.width *0.15, box.y0 - box.height*0.15, box.width*1.3, box.height * 1.3]);
+        ax.set_position([box.x0 - box.width *0.10, box.y0 - box.height*0.1, box.width*1.2, box.height * 1.2]);
     
     if (len(itemColors_) == 0):
         itemColors_ = DEFAULT_COLORS;

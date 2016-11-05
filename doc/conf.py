@@ -15,7 +15,7 @@
 
 import sys
 import os
-import shlex
+
 #######################################################
 #####Added by a Human!!! Importing alabaster theme.####
 #######################################################
@@ -29,6 +29,7 @@ html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 
 sys.path.insert(0, os.path.abspath('../python'))
+sys.path.insert(0, os.path.abspath('../'))
 
 
 # -- General configuration ------------------------------------------------
