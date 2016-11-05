@@ -1,6 +1,14 @@
 
 ==================================================================================
-==================== BUILDING DOCUMENTATION
+VIEWING ONLINE DOCUMENTATION
+==================================================================================
+
+The project's documentation can be found on
+http://pycreeper.lenkaspace.net/
+
+
+==================================================================================
+BUILDING DOCUMENTATION
 ==================================================================================
 
 Documentation can be built using sphinx.
