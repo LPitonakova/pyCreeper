@@ -7,8 +7,9 @@ import inspect;
 def checkVariableIsList(variable_, dimensions_ = 1):
     """
     Raises a TypeError if a variable is not a list.
+
     :param `variable_`: The value of a variable
-    :param `dimensions_` : (optional, default=1) The number of dimensions of the array
+    :param `dimensions_`: (optional, default=1) The number of dimensions of the array
     """
 
     throwException = False;
@@ -26,6 +27,7 @@ def checkVariableIsList(variable_, dimensions_ = 1):
 def checkListsHaveTheSameLength(list1_, list2_, list2Name_):
     """
     Raises a ValueError if 2 lists are not of the same length.
+
     :param `list1_`: List 1
     :param `list2_`: List 2
     :param `list2Name_`: Name of list 2 variable

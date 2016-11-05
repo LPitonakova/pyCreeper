@@ -1,7 +1,7 @@
 Supported figure types
 ================================
 
-.. figure:: ../examples/pieChart.png
+.. figure:: ../python/examples/pieChart.png
     :scale: 40%
 
-    Pie Chart: :func:`crGraphs.createPieChart`
+    Pie Chart: :func:`pyCreeper.crGraphs.createPieChart`

@@ -1,4 +1,4 @@
-from pyCreeper.crGraphs import createPieChart;
+from python.pyCreeper.crGraphs import createPieChart;
 
 
 def doSimpleExample():

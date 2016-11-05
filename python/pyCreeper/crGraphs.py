@@ -9,10 +9,9 @@ import pylab;
 import matplotlib.pyplot as plt
 from matplotlib import font_manager as fm
 
-import crHelpers;
-
-
 SHOW_OUTPUT = True;
+
+from . import crHelpers;
 
 TITLE_FONT_SIZE = 'xx-large';
 LABEL_FONT_SIZE = 'xx-large';
@@ -122,7 +121,8 @@ def createPieChart(data_=[], itemLabels_=[], itemColors_=[],
 def replaceInvalidWithDefaultValue(value_, defaultValue_):
     """
     Used when checking parameter values.
-    If the parameter value (`value_`) is INVALID_VALUE, returns a specified `defaultValue_` instead.
+    If the parameter value (`value_`) is `crGraphs.INVALID_VALUE`, returns a specified `defaultValue_` instead.
+
     :param `value_`: the value
     :param `defaultValue_`: the value to use if `value_` == INVALID_VALUE
     """

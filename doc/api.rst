@@ -6,7 +6,7 @@ API
 crGraphs
 ===================================================
 
-.. automodule:: crGraphs
+.. automodule:: pyCreeper.crGraphs
     :members:
     :undoc-members:
 
@@ -15,7 +15,7 @@ crGraphs
 crHelpers
 ===================================================
 
-.. automodule:: crHelpers
+.. automodule:: pyCreeper.crHelpers
     :members:
     :undoc-members:
 
