@@ -6,12 +6,15 @@ Author: Lenka Pitonakova: contact@lenkaspace.net
 
 """
 import pylab;
-import matplotlib.pyplot as plt
-from matplotlib import font_manager as fm
+import matplotlib.pyplot as plt;
+from matplotlib import font_manager as fm;
+from copy import deepcopy;
+import math;
 
 SHOW_OUTPUT = True;
 
 from . import crHelpers;
+from . import crData;
 
 TITLE_FONT_SIZE = 'xx-large';
 LABEL_FONT_SIZE = 'xx-large';
@@ -23,16 +26,16 @@ DEFAULT_MARKERS = ['b-','r-','g-','c-','k-'];
 DPI = 100;
 
 INVALID_VALUE = -999999;
-#
-def createPieChart(data_=[], itemLabels_=[], itemColors_=[],
-                    title_="", showActualVals_=True, showPercentageVals_=False, showShadow_=False,
-                    titleFontSize_=INVALID_VALUE, itemsFontSize_= INVALID_VALUE, valuesFontSize_=INVALID_VALUE, size_=(6,6),
-                    filePath_ = "", holdFigure_=False, figure_=None, subPlot_=111):
-    """
 
+def createPieChart(data_=[], title_="", itemLabels_=[], itemColors_=[],
+                    showActualVals_=True, showPercentageVals_=False, showShadow_=False,
+                    titleFontSize_=INVALID_VALUE, itemsFontSize_= INVALID_VALUE, valuesFontSize_=INVALID_VALUE, size_=(6,6),
+                    filePath_ = "", renderFigure_=True, figure_=None, subPlot_=111):
+    """
     Create a pie chart
 
     :param `data_`: A 1D list of values
+    :param `title_`: (optional, default = "") The figure title
     :param `itemLabels_`: A 1D list of value labels. Must be the same length as `data_`
     :param `itemColors_`: (optional, default = DEFAULT_COLORS) A 1D list of colors for each value. Must be the same length as `data_`
     :param `showActualVals_`: (optional, default = True) Boolean whetehr to show data values in the pie parts
@@ -41,45 +44,32 @@ def createPieChart(data_=[], itemLabels_=[], itemColors_=[],
     :param `titleFontSize_`: (optional, default = TITLE_FONT_SIZE) Font size of the title
     :param `groupsFontSize_`: (optional, default = LABEL_FONT_SIZE) Font size of the item names
     :param `valuesFontSize_`: (optional, default = TICK_FONT_SIZE) Font size of values in the pie
-    :param `size_`: (optional, default = (8,6)) Size of the graph
-    :param `filePath_`: (optional, default = "") If not empty, the graph will be saved to the file path specified. If empty, the figure will be displayed on screen instead.
-    :param `holdFigure_`: (optional, default = False) If true, the figure will not be displayed or printed
-    :param `figure_`: (optional, default = None) If not None, the graph will be created into this figure (pylab.figure)
+    :param `size_`: (optional, default = (6,6)) The figure size
+    :param `filePath_`: (optional, default = "") If not empty, the figure will be saved to the file path specified. If empty, the figure will be displayed on screen instead.
+    :param `renderFigure_`: (optional, default = True) If false, the figure will not be displayed or printed. Set to False when putting multiple figures together via the `figure_` parameter.
+    :param `figure_`: (optional, default = None) If not None, the figure will be created into this figure (pylab.figure)
     :param `subPlot_`: (optional, default = 111) The subplot id of where to place the graph to
 
-    :return: pylab.figure for the graph
-
+    :return: pylab.figure
     """
 
     #-- test and pre-set data
-    crHelpers.checkVariableIsList(data_,1);
-    crHelpers.checkVariableIsList(itemLabels_,1);
-    crHelpers.checkVariableIsList(itemColors_,1);
+    crHelpers.checkVariableIsList(data_,1,True);
+    crHelpers.checkVariableIsList(itemLabels_,True);
+    crHelpers.checkVariableIsList(itemColors_);
 
     crHelpers.checkListsHaveTheSameLength(data_, itemLabels_, "groupLabels_");
+    if (len(itemColors_) > 0):
+        crHelpers.checkListsHaveTheSameLength(data_, itemColors_, "groupLabels_");
 
     itemsFontSize_ = replaceInvalidWithDefaultValue(itemsFontSize_, LABEL_FONT_SIZE);
     valuesFontSize_ = replaceInvalidWithDefaultValue(valuesFontSize_, TICK_FONT_SIZE);
-    titleFontSize_ = replaceInvalidWithDefaultValue(titleFontSize_, TITLE_FONT_SIZE);
 
-    #--
-    
-    if (figure_ == None):
-        fig = pylab.figure(figsize=size_, dpi=DPI);
-    else:
-        fig = figure_;
-
-    ax = fig.add_subplot(subPlot_);
-
-    #-- specify title or stretch the graph if there is no title
-    if (title_ != ""):
-        fig.suptitle(title_, fontsize=titleFontSize_)
-    else:
-        box = ax.get_position();
-        ax.set_position([box.x0 - box.width *0.10, box.y0 - box.height*0.1, box.width*1.2, box.height * 1.2]);
-    
     if (len(itemColors_) == 0):
         itemColors_ = DEFAULT_COLORS;
+
+    #--
+
 
     def formatPieceNumber(val_):
         if (showActualVals_ and showPercentageVals_):
@@ -93,6 +83,7 @@ def createPieChart(data_=[], itemLabels_=[], itemColors_=[],
         return '';
         
     #-- create the graph
+    fig, ax = createFigure(size_,figure_,subPlot_,title_,titleFontSize_)
     patches, texts, autotexts = ax.pie(data_, labels=itemLabels_, autopct=formatPieceNumber, shadow=showShadow_, colors=itemColors_);
     
     #-- setup fonts
@@ -102,21 +93,185 @@ def createPieChart(data_=[], itemLabels_=[], itemColors_=[],
     proptease.set_size(valuesFontSize_);
     plt.setp(autotexts, fontproperties=proptease);
     
-    #-- display / print:
-    if (not holdFigure_):
-        if (len(filePath_) > 0):
-            pylab.savefig(filePath_, format='png')
-            if (SHOW_OUTPUT == True):
-                print("Saved " + filePath_);
-        else:
-            pylab.show()
-    #--
+    #-- display / print, return:
+    renderFigure(filePath_, renderFigure_);
+    return fig;
+
+
+
+def createMatrixPlot(data_=[[],[]], title_="", xLabel_ = "", yLabel_ = "", xTickLabels_ = [], yTickLabels_ = [], colorBarLabel_ = "",
+                    colorMap_ = None, minValue_ = INVALID_VALUE, maxValue_ = INVALID_VALUE,
+                    annotateValues_=False, annotationStringAfter_="", annotationValues_=[[],[]], roundAnnotatedValues_=False,
+                    titleFontSize_=INVALID_VALUE, labelFontSize_ = INVALID_VALUE, tickFontSize_ = INVALID_VALUE, size_=(8,6),
+                    filePath_ = "", renderFigure_=True, figure_=None, subPlot_=111):
+
+    """
+    Create 2D matrix plot where color gradient represents value on a 3rd dimension.
+
+    :param `data_`: a 2D list of values, where the 0th dimension runs along the x axis and the 1st dimension along y axis, so [0,0] in the list specified a value for the bottom left square
+    :param `title_`: (optional, default = "") The figure title
+    :param xLabel_: (optional, default = "") Label of the x-axis
+    :param yLabel_: (optional, default = "") Label of the y-axis
+    :param xTickLabels_: (optional, default = []) Labels of the individual ticks of the x-axis. If empty, values 0-N are displayed
+    :param yTickLabels_: (optional, default = []) Labels of the individual ticks of the y-axis. If empty, values 0-N are displayed
+    :param colorBarLabel_: (optional, default = "") Label of color bar, displayed vertically
+    :param colorMap_: (optional, default = "summer") A python.colormap isntance to use for the matrix plot
+    :param minValue_: (optional, default = `INVALID_VALUE`) Minimum float value that the color map considers. If set to INVALID_VALUE, the value is automatically calculated from `data_`
+    :param maxValue_: (optional, default = `INVALID_VALUE`) Maximum float value that the color map considers. If set to INVALID_VALUE, the value is automatically calculated from `data_`
+    :param annotateValues_: (optional, default = False) If True, data values will be displayed in the matrix plot
+    :param annotationStringAfter_: (optional, default = "") A string to append after each annotation value
+    :param annotationValues_: (optional, default = [[],[]]) A 2D list of annotations in the matrix plot. If non-empty, must have the same dimensions as `data_`
+    :param roundAnnotatedValues_: (optional, default = False) If True and if `annotationValues_` is empty, annotation numbers will be rounded
+    :param `titleFontSize_`: (optional, default = TITLE_FONT_SIZE) Font size of the title
+    :param `labelFontSize_`: (optional, default = LABEL_FONT_SIZE) Font size of the axis and color bar labels
+    :param `tickFontSize_`: (optional, default = TICK_FONT_SIZE) Font size of axis ticks and of values inside the plot
+    :param `size_`: (optional, default = (8,6)) The figure size
+    :param `filePath_`: (optional, default = "") If not empty, the figure will be saved to the file path specified. If empty, the figure will be displayed on screen instead.
+    :param `renderFigure_`: (optional, default = True) If false, the figure will not be displayed or printed. Set to False when putting multiple figures together via the `figure_` parameter.
+    :param `figure_`: (optional, default = None) If not None, the figure will be created into this figure (pylab.figure)
+    :param `subPlot_`: (optional, default = 111) The subplot id of where to place the graph to
+
+    :return: pylab.figure for the graph
+    """
+
+
+    #-- test and pre-set data
+    crHelpers.checkVariableIsList(data_,2,True);
+    crHelpers.checkVariableIsList(xTickLabels_);
+    crHelpers.checkVariableIsList(yTickLabels_);
+    crHelpers.checkVariableIsList(annotationValues_,2);
+
+    if (len(xTickLabels_) > 0):
+        crHelpers.checkListsHaveTheSameLength(data_[1], xTickLabels_, "xTickLabels_");
+    if (len(yTickLabels_) > 0):
+        crHelpers.checkListsHaveTheSameLength(data_, yTickLabels_, "yTickLabels_");
+
+    labelFontSize_ = replaceInvalidWithDefaultValue(labelFontSize_, LABEL_FONT_SIZE);
+    tickFontSize_ = replaceInvalidWithDefaultValue(tickFontSize_, TICK_FONT_SIZE);
+
+
+    if (len(annotationValues_[0]) == 0):
+        annotationValues_ = deepcopy(data_);
+
+    if (minValue_ == INVALID_VALUE):
+        minValue_ = crData.getMinValueInAList(data_);
+    if (maxValue_ == INVALID_VALUE):
+        maxValue_ = crData.getMaxValueInAList(data_);
+
+
+    #-- decide on colors
+    origin = 'lower';
+    if (colorMap_ == None):
+        cmap=plt.cm.get_cmap("summer");
+    else:
+        cmap=colorMap_;
+
+    #-- create the figure
+    fig, ax = createFigure(size_,figure_,subPlot_,title_,titleFontSize_,xLabel_,yLabel_,labelFontSize_, tickFontSize_)
+    cax = ax.matshow(data_,cmap=cmap,origin=origin,vmin=minValue_,vmax=maxValue_);
+
+    #-- set tick labels
+    if (len(xTickLabels_) > 0):
+        ax.set_xticklabels([''] + xTickLabels_);
+    if (len(yTickLabels_) > 0):
+        ax.set_yticklabels([''] + yTickLabels_);
+
+
+    #-- make a colorbar for the ContourSet returned by the contourf call.
+    cbar = fig.colorbar(cax)
+    cbar.ax.set_ylabel(colorBarLabel_, size=labelFontSize_);
+    for t in cbar.ax.get_yticklabels():
+        t.set_fontsize(tickFontSize_)
+
+    #-- annotations
+    if (annotateValues_):
+        #-- the XY grid position has [0;0] in the bottom left corner
+        gridStartX=0.0;
+        gridStartY=0.0;
+        gridEndX=1.0;
+        gridEndY=1.0;
+        gridStepX=(gridEndX-gridStartX)/len(data_[0]);
+        gridStepY=(gridEndY-gridStartY)/len(data_);
+        for y in range(len(data_)):
+            for x in range(len(data_[0])):
+                if (roundAnnotatedValues_):
+                    ax.annotate(str(math.ceil(annotationValues_[y][x] * 100) / 100.0) + annotationStringAfter_, xy=(gridStartX+x*gridStepX+gridStepX/2, gridStartY+y*gridStepY+gridStepY/2),  xycoords='axes fraction',horizontalalignment='center', verticalalignment='center')
+                else:
+                    ax.annotate(str(annotationValues_[y][x]) + annotationStringAfter_, xy=(gridStartX+x*gridStepX+gridStepX/2, gridStartY+y*gridStepY+gridStepY/2),  xycoords='axes fraction',horizontalalignment='center', verticalalignment='center')
+
+    #-- display / print, return:
+    renderFigure(filePath_, renderFigure_);
     return fig;
 
 
 #============================================================================
 #============================== HELPER FUNCTIONS ============================
 #============================================================================
+
+def renderFigure(filePath_="", renderFigure_=True):
+    """
+    Perform the figure rendering into a file or on screen
+
+    :param `filePath_`: (optional, default = "") If not empty, the figure will be saved to the file path specified. If empty, the figure will be displayed on screen instead.
+    :param `renderFigure_`: (optional, default = True) If false, the figure will not be displayed or printed.
+    """
+    if (renderFigure_):
+        if (len(filePath_) > 0):
+            pylab.savefig(filePath_, format='png')
+            if (SHOW_OUTPUT == True):
+                print("Saved " + filePath_);
+        else:
+            pylab.show()
+
+
+
+def createFigure(size_, title_="", xLabel_="", yLabel_="", figure_=None, subplot_=111,
+                titleFontSize_=INVALID_VALUE, labelFontSize_=INVALID_VALUE, tickFontSize_=INVALID_VALUE):
+
+    """
+    Create a figure
+
+    :param `size_`: The figure size
+    :param `title_`: (optional, default = "") The figure title
+    :param xLabel_: (optional, default = "") Label of the x-axis
+    :param yLabel_: (optional, default = "") Label of the y-axis
+    :param `figure_`: (optional, default = None) If not None, the figure will be created into this figure (pylab.figure)
+    :param `subPlot_`: (optional, default = 111) The subplot id of where to place the graph to
+    :param `titleFontSize_`: (optional, default = TITLE_FONT_SIZE) Font size of the title
+    :param `labelFontSize_`: (optional, default = LABEL_FONT_SIZE) Font size of the axis and color bar labels
+    :param `tickFontSize_`: (optional, default = TICK_FONT_SIZE) Font size of axis ticks and of values inside the plot
+
+    :return: (pylab.figure, pylab.ax)
+    """
+
+    #-- test and pre-set data
+    titleFontSize_ = replaceInvalidWithDefaultValue(titleFontSize_, TITLE_FONT_SIZE);
+    labelFontSize_ = replaceInvalidWithDefaultValue(labelFontSize_, LABEL_FONT_SIZE);
+    tickFontSize_ = replaceInvalidWithDefaultValue(tickFontSize_, TICK_FONT_SIZE);
+
+    if (figure_ == None):
+        fig = pylab.figure(figsize=size_, dpi=DPI);
+    else:
+        fig = figure_;
+
+    ax = fig.add_subplot(subplot_);
+
+    #-- specify title or stretch the graph if there is no title
+    if (title_ != ""):
+        fig.suptitle(title_, fontsize=titleFontSize_)
+    else:
+        box = ax.get_position();
+        ax.set_position([box.x0 - box.width *0.10, box.y0 - box.height*0.1, box.width*1.2, box.height * 1.2]);
+
+
+    pylab.xlabel(xLabel_, size=labelFontSize_);
+    pylab.ylabel(yLabel_, size=labelFontSize_);
+    pylab.xticks(size=tickFontSize_);
+    pylab.yticks(size=tickFontSize_);
+
+    return (fig, ax)
+
+
 
 def replaceInvalidWithDefaultValue(value_, defaultValue_):
     """
@@ -130,3 +285,5 @@ def replaceInvalidWithDefaultValue(value_, defaultValue_):
         return defaultValue_;
     else:
         return value_;
+
+

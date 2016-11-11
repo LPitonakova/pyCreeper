@@ -2,12 +2,9 @@
 import sys
 import os
 
-#######################################################
-#####Added by a Human!!! Importing alabaster theme.####
-#######################################################
-
 import sphinx_rtd_theme
 html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
+
 #######################################################
 #######################################################
 # If extensions (or modules to document with autodoc) are in another directory,

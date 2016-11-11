@@ -1,28 +1,40 @@
 """
-Various helper function used by the pyCreeper modules
+
+A module that let you create pretty graphs with single-line function calls
+
+Author: Lenka Pitonakova: contact@lenkaspace.net
+
 """
+
 import numpy;
 import inspect;
 
-def checkVariableIsList(variable_, dimensions_ = 1):
+from . import crData;
+
+def checkVariableIsList(variable_, dimensions_ = 1, nonEmpty_=False):
     """
     Raises a TypeError if a variable is not a list.
 
     :param `variable_`: The value of a variable
     :param `dimensions_`: (optional, default=1) The number of dimensions of the array
+    :param `nonEmpty_`: (optional, default=False) If true, the list must be non-empty
     """
 
     throwException = False;
-
-
-    if (type(variable_) != list and type(variable_) != numpy.ndarray):
+    numOfDimensions = crData.getNumberOfListDimensions(variable_);
+    if (numOfDimensions != dimensions_):
         throwException = True;
 
-    if (dimensions_ == 1 and len(variable_) > 0 and ( type(variable_[0]) == list or type(variable_[0]) == numpy.ndarray)):
-        throwException = True;
+    if (nonEmpty_):
+        if (len(variable_) == 0):
+            throwException = True;
 
     if (throwException):
-        raise TypeError("The " + getVariableNamePassedAsFirstParameter() + " parameter must be a " + str(dimensions_) + "D list");
+        errorStr = "The " + getVariableNamePassedAsFirstParameter() + " parameter must be a ";
+        if (nonEmpty_):
+            errorStr += "non-empty ";
+        errorStr += str(dimensions_) + "D list"
+        raise TypeError(errorStr);
 
 def checkListsHaveTheSameLength(list1_, list2_, list2Name_):
     """

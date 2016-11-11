@@ -1,3 +1,21 @@
+==================================================================================
+INSTALLING DEPENDENCIES
+==================================================================================
+
+1. Python 3.4
+------------------------------------------------------
+Make sure you have Python 3.4 installed. E.g., if you are using macports:
+
+sudo port install python34
+
+
+2. Matplotlib toolkit
+------------------------------------------------------
+Install the python 3.4 matplot lib tool kit. E.g., if you are using macports:
+
+sudo port install py34-matplotlib-basemap
+
+
 
 ==================================================================================
 VIEWING ONLINE DOCUMENTATION
@@ -13,13 +31,13 @@ BUILDING DOCUMENTATION
 
 Documentation can be built using sphinx.
 
-1. Make sure you have sphinx for Python 2.7 installed.
+1. Make sure you have sphinx for Python 3.4 installed.
 ------------------------------------------------------
 
-E.g., if you using macports:
+E.g., if you are using macports:
 
-sudo port install py27-sphinx
-sudo port select --set sphinx py27-sphinx
+sudo port install py34-sphinx
+sudo port select --set sphinx py34-sphinx
 
 Other examples on http://www.sphinx-doc.org/en/1.4.8/install.html
 

@@ -1,4 +1,4 @@
-from python.pyCreeper.crGraphs import createPieChart;
+from python.pyCreeper import crGraphs;
 
 
 def doSimpleExample(saveFiles_):
@@ -9,7 +9,6 @@ def doSimpleExample(saveFiles_):
         :scale: 50%
 
     :param saveFiles_: Boolean if True, figures are saved, if False, figures are displayed
-
     """
     expenseCategories = ["Rent", "Food", "Travel", "Fun"];
     expenses = [1000, 300, 500, 250];
@@ -17,7 +16,7 @@ def doSimpleExample(saveFiles_):
     filePath = "";
     if (saveFiles_):
         filePath = "pieChart_simple.png";
-    createPieChart(expenses, expenseCategories,filePath_=filePath);
+    crGraphs.createPieChart(expenses, expenseCategories,filePath_=filePath);
 
 def doColorsExample(saveFiles_):
     """
@@ -27,7 +26,6 @@ def doColorsExample(saveFiles_):
         :scale: 50%
 
     :param saveFiles_: Boolean if True, figures are saved, if False, figures are displayed
-
     """
     expenseCategories = ["Rent", "Food", "Travel", "Fun"];
     expenses = [1000, 300, 500, 250];
@@ -36,7 +34,7 @@ def doColorsExample(saveFiles_):
     filePath = "";
     if (saveFiles_):
         filePath = "pieChart_colors.png";
-    createPieChart(expenses, expenseCategories, colors, title_="Colors example", showPercentageVals_=True, showShadow_=True, filePath_=filePath);
+    crGraphs.createPieChart(expenses, expenseCategories, colors, title_="Colors example", showPercentageVals_=True, showShadow_=True, filePath_=filePath);
 
 def doMultiFigurePrintExample(saveFiles_):
     """
@@ -46,14 +44,13 @@ def doMultiFigurePrintExample(saveFiles_):
         :scale: 100%
 
     :param saveFiles_: Boolean if True, figures are saved, if False, figures are displayed
-
     """
 
     #-- create 1st figure. Make it portait size and use the holdFigure_=True argument to specify that the figure should not be displayed yet
     expenseCategories = ["Rent", "Food", "Travel", "Fun"];
     expenses = [1000, 300, 500, 250];
 
-    figure1 =  createPieChart(expenses, expenseCategories, title_ = "Expenses", subPlot_=121, size_=(14,6), holdFigure_=True);
+    figure1 = crGraphs.createPieChart(expenses, expenseCategories, title_ = "Expenses", subPlot_=121, size_=(14,6), renderFigure_=False);
 
     #-- create 2nd figure into the figure1 saved previously. Specify the file path to save into.
     countries = ["Germany", "USA", "Canada"];
@@ -62,12 +59,13 @@ def doMultiFigurePrintExample(saveFiles_):
     filePath = "";
     if (saveFiles_):
         filePath = "pieChart_large.png";
-    createPieChart(numOfCountryVisits, countries, showPercentageVals_=True, showActualVals_=False,
+    crGraphs.createPieChart(numOfCountryVisits, countries, showPercentageVals_=True, showActualVals_=False,
                     subPlot_=122,figure_=figure1, filePath_=filePath);
 
 if __name__ == "__main__":
 
     saveFiles = True;
+
     doSimpleExample(saveFiles);
     doColorsExample(saveFiles);
     doMultiFigurePrintExample(saveFiles);
