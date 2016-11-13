@@ -1,5 +1,5 @@
 """
-crData - library for python that lets you read data from files and manipulate data, mainly for use by crGraphs
+A module that lets you read data from files and manipulate data, mainly for use by crGraphs
 
 Author: Lenka Pitonakova: contact@lenkaspace.net
 
@@ -20,9 +20,9 @@ def getNumberOfListDimensions(list_):
     To correctly measure dimensionality, it is recommended that the list doesn't contain empty sublists and that
     all elements (apart from those in the highest dimension) are of the same type.
 
-    :param list_: the list
+    :param list_: The list
 
-    :return: int : the number of dimensions
+    :return: int : The number of dimensions
     """
     stop = False;
     dimension = 0;
@@ -54,6 +54,13 @@ def getNumberOfListDimensions(list_):
 
 
 def getMinValueInAList(list_):
+    """
+    Get a minimum value from an N-dimensional list of numbers
+
+    :param list_: The list
+
+    :return: number
+    """
 
     numOfDimensions = getNumberOfListDimensions(list_);
     if (numOfDimensions == 1):
@@ -65,6 +72,13 @@ def getMinValueInAList(list_):
 
 
 def getMaxValueInAList(list_):
+    """
+    Get a maximum value from an N-dimensional list of numbers
+
+    :param list_: The list
+
+    :return: number
+    """
 
     numOfDimensions = getNumberOfListDimensions(list_);
     if (numOfDimensions == 1):

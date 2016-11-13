@@ -1,6 +1,6 @@
 """
 
-A module that let you create pretty graphs with single-line function calls
+A module that lets you create pretty graphs with single-line function calls
 
 Author: Lenka Pitonakova: contact@lenkaspace.net
 

@@ -2,6 +2,18 @@
 API
 ===================================================
 
+------------------------------------
+The most useful functions
+------------------------------------
+
+Creating figures:
+
+* :func:`pyCreeper.crGraphs.createMatrixPlot`
+* :func:`pyCreeper.crGraphs.createPieChart`
+
+Working with lists:
+
+* :func:`pyCreeper.crData.getNumberOfListDimensions`
 
 --------------------
 crGraphs
@@ -11,12 +23,19 @@ crGraphs
     :members:
     :undoc-members:
 
+--------------------
+crData
+--------------------
+
+.. automodule:: pyCreeper.crData
+    :members:
+    :undoc-members:
 
 --------------------
 crHelpers
 --------------------
 
-.. automodule:: python.pyCreeper.crHelpers
+.. automodule:: pyCreeper.crHelpers
     :members:
     :undoc-members:
 
