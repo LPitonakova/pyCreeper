@@ -23,6 +23,10 @@ import matplotlib.pyplot as plt;
 from matplotlib import font_manager as fm;
 from copy import deepcopy;
 import math;
+import numpy;
+import scipy;
+import itertools;
+from enum import Enum, unique
 
 from . import crHelpers;
 from . import crData;
@@ -38,93 +42,377 @@ LABEL_FONT_SIZE = 'xx-large';
 TICK_FONT_SIZE = "large";
 
 DEFAULT_COLORS = ['b','r','g','c','k'];
-DEFAULT_MARKERS = ['b-','r-','g-','c-','k-'];
-
-
+DEFAULT_MARKERS = ['bs-','rs-','gs-','cs-','ks-'];
 
 INVALID_VALUE = -999999;
 
-def createPieChart(data_=[], itemLabels_=[],
-                    title_="", itemColors_=[],
-                    showActualVals_=True, showPercentageVals_=False, showShadow_=False,
-                    titleFontSize_=INVALID_VALUE, itemsFontSize_= INVALID_VALUE, valuesFontSize_=INVALID_VALUE, size_=(6,6),
-                    filePath_ = "", renderFigure_=True, figure_=None, subPlot_=111):
+@unique
+class LEGEND_POSITION(Enum):
     """
-    Create a pie chart.
+    Members: BEST, UPPER_RIGHT, UPPER_LEFT, LOWER_LEFT, LOWER_RIGHT, RIGHT, CENTER_LEFT, CENTER_RIGHT, LOWER_CENTER, UPPER_CENTER, CENTER
+    """
+    BEST = "best"
+    UPPER_RIGHT = "upper right"
+    UPPER_LEFT = "upper left"
+    LOWER_LEFT = "lower left"
+    LOWER_RIGHT = "lower right"
+    RIGHT = "right"
+    CENTER_LEFT = "center left"
+    CENTER_RIGHT = "center right"
+    LOWER_CENTER = "lower center"
+    UPPER_CENTER = "upper center"
+    CENTER = "center"
 
-     Minimal example:
+@unique
+class GRID_TYPE(Enum):
+    """
+    Members: BEST, UPPER_RIGHT, UPPER_LEFT, LOWER_LEFT, LOWER_RIGHT, RIGHT, CENTER_LEFT, CENTER_RIGHT, LOWER_CENTER, UPPER_CENTER, CENTER
+    """
+    NONE = 0
+    FULL = 1
+    HORIZONTAL = 2
+    VERTICAL = 3
+    MAJOR = 4
+    MAJOR_HORIZONTAL = 5
+    MAJOR_VERTICAL = 6
+    MINOR = 7
+    MINOR_HORIZONTAL = 8
+    MINOR_VERTICAL = 9
+
+
+
+
+#--------------------------------------------------------------------------------------------------------- Line plot
+
+def createLinePlot(data_,
+                title_="", xLabel_ = "", yLabel_ = "", xTickLabels_=[], legendLabels_ = [], numOfLegendColumns_ = 2, legendPosition_=LEGEND_POSITION.BEST, markers_ = [], colors_ = [],
+                showBoxPlots_=False, boxPlotWidth_=-1, showConfidenceIntervals_=False, doWilcoxon_=False,
+                lineWidth_ = 2, lineStyles_ = [], markerSize_=10, gridType_=GRID_TYPE.FULL,
+                xMin_=-INVALID_VALUE,xMax_=-INVALID_VALUE, xAxisGroupSize_ = 0, yMin_=-INVALID_VALUE, yMax_=-INVALID_VALUE, yTicksStep_ = 0, yTicksStepMultiplier_ = 1,
+                titleFontSize_=INVALID_VALUE, labelFontSize_ = INVALID_VALUE, tickFontSize_ = INVALID_VALUE, legendFontSize_ = INVALID_VALUE, size_=(12,6),
+                filePath_ = "", renderFigure_=True, figure_=None, subPlot_=111):
+
+
+    """
+
+    Create one of a plot with a single or multiple lines. Optionally, each data point can have error bars or box plots around it.
+
+    Minimal example:
 
     .. code-block:: python
 
-        expenseCategories = ["Rent", "Food", "Travel", "Fun"];
-        expenses = [1000, 300, 500, 250];
-        crGraphs.createPieChart(expenses, expenseCategories);
+        profitData = [
+                [1, 2, 4, 3, 6, 8]
+        ];
+
+        crGraphs.createLinePlot(profitData);
 
 
-    :param `data_`: A 1D list of values
-    :param `itemLabels_`: A 1D list of value labels. Must be the same length as `data_`
-    :param `title_`: (optional, default = "") The figure title
-    :param `itemColors_`: (optional, default = DEFAULT_COLORS) A 1D list of colors for each value. Must be the same length as `data_`
-    :param `showActualVals_`: (optional, default = True) Boolean whetehr to show data values in the pie parts
-    :param `showPercentageVals_`: (optional, default = False) Boolean whether to show percentages in the pie parts
-    :param `showShadow_`: (optional, default = False) Boolean whether to show shadow underneath the pie
-    :param `titleFontSize_`: (optional, default = TITLE_FONT_SIZE) Font size of the title
-    :param `groupsFontSize_`: (optional, default = LABEL_FONT_SIZE) Font size of the item names
-    :param `valuesFontSize_`: (optional, default = TICK_FONT_SIZE) Font size of values in the pie
-    :param `size_`: (optional, default = (6,6)) The figure size
-    :param `filePath_`: (optional, default = "") If not empty, the figure will be saved to the file path specified. If empty, the figure will be displayed on screen instead.
-    :param `renderFigure_`: (optional, default = True) If false, the figure will not be displayed or printed. Set to False when putting multiple figures together via the `figure_` parameter.
-    :param `figure_`: (optional, default = None) If not None, the figure will be created into this figure (pylab.figure)
-    :param `subPlot_`: (optional, default = 111) The subplot id of where to place the graph to
 
-    :return: pylab.figure
+
+    Parameters:
+    ---------------------------------------
+
+    - data: dimension 1: line index. Dimension 2: values in those lines. Optional dim 3: list of values for 1 data point.
+    - xTickData must be 1D array of scalars, which is why we need xTickLabels as well
+
+    - legendPosition_ : a :class:`.LEGEND_POSITION` enum member
+
+
+    doWilcoxon_: Set to true to put asterix when the difference of 2 means is significant, based on the Wilcoxon signed-rank test (http://en.wikipedia.org/wiki/Wilcoxon_signed-rank_test)
+    yTicksStep_ : If > 0, the yticks will be changed so that each yTicksStep_ value is shown
+    yTicksStepMultiplier_: if yTicksStep_>0, additionally this parameter specified how the yTicksStep_ is multiplied when shown on the graph.
+    xAxisGroupSize_: if > 0, specifies how many points along the X axis will be linked by a line. E.g if xAxisGroupSize_ = 3, there will be a gap in the line between each 3rd,6th,9th,.. and 4th,7th,10th,.. point.
+
+    Example: box plots next to each other:
+    ---------------------------------------
+    If we have a parameter value we vary and a list of values for each parameter (e.g. from different runs), we
+    can plot box plots next to each other and show the parameter value along the X axis:
+    groups = [1,2,3,4,5];
+    yData = [[dataVals1,dataVals2,dataVals3,dataVals4,dataVals5]];
+    createPlot(groups,yData);
+
+    Example multiple box plots on top of each other:
+    ------------------------------------------------
+    For example for box plots, if we have 3 groups (plotted along x axis, where group is just a parameter)
+    and 2 parameter values that we want to compare, we want to plot for each group
+    2 box plots one above another. Then the box plots are connected between groups.
+
+    groups = [10,30,50];
+    yData = [   [data_10_vals1, data_30_vals1,data_50_vals1],
+                [data_10_vals2, data_30_vals2,data_50_vals2] ];
+    createPlot(groups,yData,boxPlots_=True);
+
     """
 
     #-- test and pre-set data
-    crHelpers.checkVariableIsList(data_,1,True);
-    crHelpers.checkVariableIsList(itemLabels_,True);
-    crHelpers.checkVariableIsList(itemColors_);
+    numOfDataDimensions = crData.getNumberOfListDimensions(data_);
+    if (numOfDataDimensions < 2 or numOfDataDimensions > 3):
+        raise ValueError("The data_ parameter must be a 2D or a 3D list.")
 
-    crHelpers.checkListsHaveTheSameLength(data_, itemLabels_, "itemLabels_");
+    if (len(xTickLabels_) == 0):
+        xTickLabels_ = range(len(data_[0]));
 
-    if (len(itemColors_) > 0):
-        crHelpers.checkListsHaveTheSameLength(data_, itemColors_, "itemColors_");
+    crHelpers.checkListsHaveTheSameLength(data_[0], xTickLabels_, "xTickLabels_");
 
-    itemsFontSize_ = replaceInvalidWithDefaultValue(itemsFontSize_, LABEL_FONT_SIZE);
-    valuesFontSize_ = replaceInvalidWithDefaultValue(valuesFontSize_, TICK_FONT_SIZE);
+    crHelpers.checkVariableDataType(legendPosition_, LEGEND_POSITION);
+    crHelpers.checkVariableDataType(gridType_, GRID_TYPE);
 
-    if (len(itemColors_) == 0):
-        itemColors_ = DEFAULT_COLORS;
+    titleFontSize_ = replaceInvalidWithDefaultValue(titleFontSize_, TITLE_FONT_SIZE)
+    labelFontSize_ = replaceInvalidWithDefaultValue(labelFontSize_, LABEL_FONT_SIZE);
+    tickFontSize_ = replaceInvalidWithDefaultValue(tickFontSize_, TICK_FONT_SIZE);
+    legendFontSize_ = replaceInvalidWithDefaultValue(legendFontSize_, LABEL_FONT_SIZE);
 
-    #--
 
-    def formatPieceNumber(val_):
-        if (showActualVals_ and showPercentageVals_):
-            val=int(val_*sum(data_)/100.0)
-            return '{p:.1f}% ({v:d})'.format(p=val_,v=val);
-        if (showActualVals_):
-            val=int(val_*sum(data_)/100.0)
-            return '{v:d}'.format(v=val);
-        elif (showPercentageVals_):
-            return '{p:.2f}%'.format(p=val_);
-        return '';
-        
-    #-- create the graph
-    fig, ax = createFigure(size_, title_, figure_, subPlot_, titleFontSize_=titleFontSize_);
-    patches, texts, autotexts = ax.pie(data_, labels=itemLabels_, autopct=formatPieceNumber, shadow=showShadow_, colors=itemColors_);
-    
-    #-- setup fonts
-    proptease = fm.FontProperties();
-    proptease.set_size(itemsFontSize_);
-    plt.setp(texts, fontproperties=proptease);
-    proptease.set_size(valuesFontSize_);
-    plt.setp(autotexts, fontproperties=proptease);
-    
+    if (doWilcoxon_):
+        if (len(data_) != 2):
+            doWilcoxon_ = False;
+            print ("!!! Cannot perform Wilcoxon signed-rank test between more than 2 plot lines, i.e., the size of data_ must be 2.");
+        elif (numOfDataDimensions < 3):
+            doWilcoxon_ = False;
+            print ("!!! Cannot perform Wilcoxon signed-rank test: each plot's data point represented by data_ must be a list, i.e., data_ must be a 3D list.");
+
+    if (showBoxPlots_ and numOfDataDimensions < 3):
+        print ("!!! Cannot draw box plots: each plot's data point represented by data_ must be a list, i.e., data_ must be a 3D list.");
+    if (showConfidenceIntervals_ and numOfDataDimensions < 3):
+        print ("!!! Cannot draw confidence intervals: each plot's data point represented by data_ must be a list, i.e., data_ must be a 3D list.");
+
+
+    #-- create the figure
+    yStretch = 1.05;
+    numOfLegendRows = math.ceil(len(legendLabels_) / numOfLegendColumns_);
+
+    #if (numOfLegendRows > 0):
+        #yStretch = 0.90 - numOfLegendRows*0.1;
+
+    fig, ax = createFigure(size_, title_, figure_, subPlot_, xLabel_, yLabel_, titleFontSize_, labelFontSize_, tickFontSize_, 1.2, yStretch);
+
+
+    #-- prepare x tick data, which has to be scalars
+    xTickData = [];
+    if (type(xTickLabels_) == int):
+        #-- xTickLabels_ are numbers, ok to use for plotting
+        xTickData = xTickLabels_;
+    else:
+        #-- xTickLabels_ are strings, the xTickData must be an array from 0-length of xTickLabels_
+        xTickData = range(len(xTickLabels_));
+
+
+    #-- prepare box plot width
+    if ((showBoxPlots_ and boxPlotWidth_ <= 0) or showConfidenceIntervals_):
+        boxPlotWidth_ = abs(xTickData[-1] - xTickData[0]) / 20.0;
+
+
+    #-- do the potting
+    plots = [];
+    maxVal = -999999;
+    for i in range(len(data_)):
+        legendLabel = " ";
+        #-- choose a legend label
+        if (len(legendLabels_) > i):
+            legendLabel = legendLabels_[i];
+
+        #-- choose a marker
+        marker = DEFAULT_MARKERS[0];
+        if (len(markers_) > i):
+            marker = markers_[i];
+        elif (len(DEFAULT_MARKERS) > i):
+            marker = DEFAULT_MARKERS[i];
+
+        #-- choose a color, default to marker color
+        color = marker[0:1];
+        if (len(colors_) > i):
+            color = colors_[i];
+
+        lineStyle = '-';
+        if (len(lineStyles_) > i):
+            lineStyle = lineStyles_[i];
+        elif (lineWidth_ == 0):
+            lineStyle = '';
+
+        #-- apply custom x tick labels
+        if (len(xTickLabels_) > 0):
+            plt.xticks(xTickData, xTickLabels_);
+
+        #-- find out how many line segments
+        numOfSegments = 0;
+        lineSegmentLength = xAxisGroupSize_;
+        if (xAxisGroupSize_ > 0):
+            numOfSegments = int(math.ceil(len(xTickData) / xAxisGroupSize_));
+        else:
+            numOfSegments = 1;
+            lineSegmentLength = len(xTickData);
+
+        #-- plot
+        if (numOfDataDimensions == 3):
+            #-- each element for a single data point is a list.
+            #-- only plot median of data that is a list. Box plots can be added later if set
+            #-- get medians one by one, as numpy can't deal with lists of different lengths
+            medians = [];
+            for q in range(len(data_[i])):
+                medians.append(numpy.median(data_[i][q]));
+                if (doWilcoxon_ and i == 1):
+                    #-- do the Wilcoxon test on individual samples (that together form a median) and compare them to runs of previous data set:
+                    pVal = scipy.stats.wilcoxon(data_[i][q],data_[0][q])[1];
+                    if (pVal < 0.01):
+                        xTickLabels_[q] = str(xTickLabels_[q]) + "**";
+                    elif (pVal < 0.05):
+                        xTickLabels_[q] = str(xTickLabels_[q]) + "*";
+
+            maxMedian = crData.getMaxValueInAList(medians);
+            if (maxMedian > maxVal):
+                maxVal = maxMedian;
+
+            if (showConfidenceIntervals_):
+                dataDof = [(len(data_[i][q])-1) for q in range(len(medians))]; #degrees of freedom is sample size -1
+                dataStd = [numpy.std(data_[i][q]) for q in range(len(medians))];
+                (_, caps, _) = plt.errorbar(xTickData, medians, yerr=scipy.stats.t.ppf(0.95, dataDof)*dataStd, color=color, linewidth=0, elinewidth=lineWidth_, capsize=markerSize_-2, linestyle=lineStyle);
+                for cap in caps:
+                    if (lineWidth_ == 0):
+                        cap.set_markeredgewidth(3);
+                    else:
+                        cap.set_markeredgewidth(lineWidth_);
+
+            #-- draw, in line segments
+            for seg in range(numOfSegments):
+                segStart = seg * lineSegmentLength;
+                segEnd = segStart + lineSegmentLength;
+                if (segEnd > len(xTickData)):
+                    segEnd = len(xTickData-1);
+                plot = pylab.plot(xTickData[segStart:segEnd], medians[segStart:segEnd], marker, color=color, label = legendLabel, linewidth=lineWidth_, linestyle=lineStyle, markersize=markerSize_);
+
+        else:
+            #-- each element for a single data point is a single number. Plot directly from these numbers.
+
+            maxVal = crData.getMaxValueInAList(data_);
+            #-- draw, in line segments
+            for seg in range(numOfSegments):
+                segStart = seg * lineSegmentLength;
+                segEnd = segStart + lineSegmentLength;
+                if (segEnd > len(xTickData)):
+                    segEnd = len(xTickData-1);
+
+                plot = pylab.plot(xTickData[segStart:segEnd], data_[i][segStart:segEnd], marker, color=color, label = legendLabel, linewidth=lineWidth_, linestyle=lineStyle, markersize=markerSize_);
+
+        plots.append(plot);
+
+        #-- do box plots
+        if (showBoxPlots_):
+            boxPlot = pylab.boxplot(data_[i],positions=xTickData,widths=boxPlotWidth_);
+            pylab.setp(boxPlot['boxes'], color=color);
+            pylab.setp(boxPlot['whiskers'], color=color);
+            pylab.setp(boxPlot['medians'], color=color);
+            pylab.setp(boxPlot['fliers'], color=color);
+            pylab.setp(boxPlot['caps'], color=color);
+
+            boxPlotLineWidth = 1;
+            if (boxPlotLineWidth <= 0):
+                boxPlotLineWidth = 1;
+            for box in boxPlot['boxes']:
+                box.set(linewidth=boxPlotLineWidth)
+            for median in boxPlot['medians']:
+                median.set(linewidth=boxPlotLineWidth)
+            for cap in boxPlot['caps']:
+                cap.set(linewidth=boxPlotLineWidth)
+
+            #-- reapply x ticks labels
+            ax.set_xticklabels(xTickLabels_);
+
+
+    #-- grid
+    if (gridType_ != GRID_TYPE.NONE):
+        gridAxis = 'both';
+        gridWhich = 'both';
+        if (gridType_ == GRID_TYPE.HORIZONTAL or gridType_ == GRID_TYPE.MAJOR_HORIZONTAL or gridType_ == GRID_TYPE.MINOR_HORIZONTAL):
+            gridAxis = 'y';
+        elif (gridType_ == GRID_TYPE.VERTICAL or gridType_ == GRID_TYPE.MAJOR_VERTICAL or gridType_ == GRID_TYPE.MAJOR_VERTICAL):
+            gridAxis = 'x';
+
+        if (gridType_ == GRID_TYPE.MAJOR or gridType_ == GRID_TYPE.MAJOR_HORIZONTAL or gridType_ == GRID_TYPE.MAJOR_VERTICAL):
+            gridWhich = 'major';
+        elif (gridType_ == GRID_TYPE.MINOR or gridType_ == GRID_TYPE.MINOR_HORIZONTAL or gridType_ == GRID_TYPE.MINOR_VERTICAL):
+            gridWhich = 'minor';
+
+        ax.grid(which=gridWhich, axis=gridAxis);
+
+    #-- adjust x axis and y axis limits:
+    if (showBoxPlots_ or showConfidenceIntervals_):
+        #-- make space for box plots
+        ax.set_xlim(xTickData[0]-2*boxPlotWidth_/3.0,xTickData[-1]+2*boxPlotWidth_/3.0);
+    else:
+        #-- make a little space
+        ax.set_xlim(xTickData[0]-xTickData[-1]*0.01,xTickData[-1]+xTickData[-1]*0.01);
+
+
+    if (xMin_ > -INVALID_VALUE and xMax_ > -INVALID_VALUE):
+        ax.set_xlim(xMin_, xMax_);
+
+    if (yMin_ > -INVALID_VALUE and yMax_ > -INVALID_VALUE):
+        ax.set_ylim(yMin_, yMax_);
+
+    #-- recursively find the correct yTickStep based on the max value. The yTickStep should fit 10 times into maxVal.
+    #   then annotate the y axis.
+    if (yTicksStep_ <= 0):
+        yTicksStep_ = 1;
+        stop = False;
+
+        while (stop == False):
+            if (maxVal / yTicksStep_ <= 10):
+                stop = True;
+            else:
+                yTicksStep_ *= 10;
+
+    ticks = [];
+    ticksLabels = [];
+
+    start, stop = ax.get_ylim();
+    if (yMax_ != -INVALID_VALUE):
+        stop = yMax_;
+
+    if (yMin_ != -INVALID_VALUE):
+        start = yMin_;
+    if (yMin_ == - yMax_*0.05):
+        start = 0;
+
+    ticks = numpy.arange(start, stop + yTicksStep_, yTicksStep_);
+    ax.set_yticks(ticks);
+
+    if (yTicksStepMultiplier_ != 1):
+        for t in range(len(ticks)):
+            ticksLabels.append(ticks[t] * yTicksStepMultiplier_);
+        ax.set_yticklabels(ticksLabels);
+        ticks = ticksLabels;
+
+    ticksLabels = [];
+    for t in range(len(ticks)):
+        intVal = int(ticks[t]);
+        if (intVal >= 1000):
+            ticksLabels.append("{}k".format( intVal / 1000));
+        else:
+            ticksLabels.append(ticks[t]);
+    ax.set_yticklabels(ticksLabels);
+
+    #-- show legend
+    if (len(legendLabels_) > 0):
+        legendItems = [];
+        for g in range(len(plots)):
+            legendItems.append(plots[g][0]);
+        legend = ax.legend(flip(legendItems, numOfLegendColumns_), flip(legendLabels_,numOfLegendColumns_),loc=legendPosition_.value, ncol=numOfLegendColumns_)
+        for t in legend.get_texts():
+            if (type(legendFontSize_) == str):
+                t.set_fontsize(legendFontSize_)
+            else:
+                font = math.QFont(t.font());
+                font.setPointSize(legendFontSize_);
+                t.setFont(font);
+
+
     #-- display / print, return:
     renderFigure(filePath_, renderFigure_);
     return fig;
 
 
+#--------------------------------------------------------------------------------------------------------- Matrix plot
 
 def createMatrixPlot(data_=[[],[]],
                     title_="", xLabel_ = "", yLabel_ = "", xTickLabels_ = [], yTickLabels_ = [], colorBarLabel_ = "",
@@ -242,6 +530,88 @@ def createMatrixPlot(data_=[[],[]],
     renderFigure(filePath_, renderFigure_);
     return fig;
 
+#--------------------------------------------------------------------------------------------------------- Pie chart
+
+def createPieChart(data_=[], itemLabels_=[],
+                    title_="", itemColors_=[],
+                    showActualVals_=True, showPercentageVals_=False, showShadow_=False,
+                    titleFontSize_=INVALID_VALUE, itemsFontSize_= INVALID_VALUE, valuesFontSize_=INVALID_VALUE, size_=(6,6),
+                    filePath_ = "", renderFigure_=True, figure_=None, subPlot_=111):
+    """
+    Create a pie chart.
+
+     Minimal example:
+
+    .. code-block:: python
+
+        expenseCategories = ["Rent", "Food", "Travel", "Fun"];
+        expenses = [1000, 300, 500, 250];
+        crGraphs.createPieChart(expenses, expenseCategories);
+
+
+    :param `data_`: A 1D list of values
+    :param `itemLabels_`: A 1D list of value labels. Must be the same length as `data_`
+    :param `title_`: (optional, default = "") The figure title
+    :param `itemColors_`: (optional, default = DEFAULT_COLORS) A 1D list of colors for each value. Must be the same length as `data_`
+    :param `showActualVals_`: (optional, default = True) Boolean whetehr to show data values in the pie parts
+    :param `showPercentageVals_`: (optional, default = False) Boolean whether to show percentages in the pie parts
+    :param `showShadow_`: (optional, default = False) Boolean whether to show shadow underneath the pie
+    :param `titleFontSize_`: (optional, default = TITLE_FONT_SIZE) Font size of the title
+    :param `groupsFontSize_`: (optional, default = LABEL_FONT_SIZE) Font size of the item names
+    :param `valuesFontSize_`: (optional, default = TICK_FONT_SIZE) Font size of values in the pie
+    :param `size_`: (optional, default = (6,6)) The figure size
+    :param `filePath_`: (optional, default = "") If not empty, the figure will be saved to the file path specified. If empty, the figure will be displayed on screen instead.
+    :param `renderFigure_`: (optional, default = True) If false, the figure will not be displayed or printed. Set to False when putting multiple figures together via the `figure_` parameter.
+    :param `figure_`: (optional, default = None) If not None, the figure will be created into this figure (pylab.figure)
+    :param `subPlot_`: (optional, default = 111) The subplot id of where to place the graph to
+
+    :return: pylab.figure
+    """
+
+    #-- test and pre-set data
+    crHelpers.checkVariableIsList(data_,1,True);
+    crHelpers.checkVariableIsList(itemLabels_,True);
+    crHelpers.checkVariableIsList(itemColors_);
+
+    crHelpers.checkListsHaveTheSameLength(data_, itemLabels_, "itemLabels_");
+
+    if (len(itemColors_) > 0):
+        crHelpers.checkListsHaveTheSameLength(data_, itemColors_, "itemColors_");
+
+    itemsFontSize_ = replaceInvalidWithDefaultValue(itemsFontSize_, LABEL_FONT_SIZE);
+    valuesFontSize_ = replaceInvalidWithDefaultValue(valuesFontSize_, TICK_FONT_SIZE);
+
+    if (len(itemColors_) == 0):
+        itemColors_ = DEFAULT_COLORS;
+
+    #--
+
+    def formatPieceNumber(val_):
+        if (showActualVals_ and showPercentageVals_):
+            val=int(val_*sum(data_)/100.0)
+            return '{p:.1f}% ({v:d})'.format(p=val_,v=val);
+        if (showActualVals_):
+            val=int(val_*sum(data_)/100.0)
+            return '{v:d}'.format(v=val);
+        elif (showPercentageVals_):
+            return '{p:.2f}%'.format(p=val_);
+        return '';
+
+    #-- create the graph
+    fig, ax = createFigure(size_, title_, figure_, subPlot_, titleFontSize_=titleFontSize_);
+    patches, texts, autotexts = ax.pie(data_, labels=itemLabels_, autopct=formatPieceNumber, shadow=showShadow_, colors=itemColors_);
+
+    #-- setup fonts
+    proptease = fm.FontProperties();
+    proptease.set_size(itemsFontSize_);
+    plt.setp(texts, fontproperties=proptease);
+    proptease.set_size(valuesFontSize_);
+    plt.setp(autotexts, fontproperties=proptease);
+
+    #-- display / print, return:
+    renderFigure(filePath_, renderFigure_);
+    return fig;
+
 
 #============================================================================
 #============================== HELPER FUNCTIONS ============================
@@ -267,7 +637,8 @@ def renderFigure(filePath_="", renderFigure_=True):
 
 def createFigure(size_, title_="", figure_=None, subPlot_=111,
                 xLabel_="", yLabel_="",
-                titleFontSize_=INVALID_VALUE, labelFontSize_=INVALID_VALUE, tickFontSize_=INVALID_VALUE):
+                titleFontSize_=INVALID_VALUE, labelFontSize_=INVALID_VALUE, tickFontSize_=INVALID_VALUE,
+                xStretchMultiply_=1.2, yStretchMultiply_=1.2):
 
     """
     A helper function that creates a figure.
@@ -281,6 +652,8 @@ def createFigure(size_, title_="", figure_=None, subPlot_=111,
     :param `titleFontSize_`: (optional, default = TITLE_FONT_SIZE) Font size of the title
     :param `labelFontSize_`: (optional, default = LABEL_FONT_SIZE) Font size of the axis and color bar labels
     :param `tickFontSize_`: (optional, default = TICK_FONT_SIZE) Font size of axis ticks and of values inside the plot
+    :param `xStretchMultiply_`: (optional, default = 1.2) By how much to stretch the plot inside the figure in x direction. Enter 1.0 to leave the plot as is.
+    :param `yStretchMultiply_`: (optional, default = 1.2) By how much to stretch the plot inside the figure in y direction. Enter 1.0 to leave the plot as is.
 
     :return: (pylab.figure, pylab.ax)
     """
@@ -297,14 +670,16 @@ def createFigure(size_, title_="", figure_=None, subPlot_=111,
 
     ax = fig.add_subplot(subPlot_);
 
-    #-- specify title or stretch the graph if there is no title
+    #-- specify title, stretch the plot
+    xStretchMultiply_ = xStretchMultiply_-1;
+    yStretchMultiply_ = yStretchMultiply_-1;
     if (title_ != ""):
-        fig.suptitle(title_, fontsize=titleFontSize_)
-        box = ax.get_position();
-        ax.set_position([box.x0 - box.width *0.05, box.y0 - box.height*0.1, box.width*1.1, box.height * 1.1]);
-    else:
-        box = ax.get_position();
-        ax.set_position([box.x0 - box.width *0.10, box.y0 - box.height*0.1, box.width*1.2, box.height * 1.2]);
+        fig.suptitle(title_, fontsize=titleFontSize_);
+        xStretchMultiply_ -= 0.1;
+        yStretchMultiply_ -= 0.1;
+
+    box = ax.get_position();
+    ax.set_position([box.x0 - box.width * (xStretchMultiply_/2), box.y0 - box.height*yStretchMultiply_/2, box.width*(1+xStretchMultiply_), box.height*(1+yStretchMultiply_)]);
 
 
     pylab.xlabel(xLabel_, size=labelFontSize_);
@@ -328,5 +703,9 @@ def replaceInvalidWithDefaultValue(value_, defaultValue_):
         return defaultValue_;
     else:
         return value_;
+
+
+def flip(items, ncol):
+    return itertools.chain(*[items[i::ncol] for i in range(ncol)])
 
 
