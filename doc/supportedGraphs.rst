@@ -3,6 +3,31 @@ Supported figure types
 ===================================================
 
 ----------------------------
+Box plots
+----------------------------
+.. figure:: ../exampleOutput/linePlot_boxPlots2.png
+    :scale: 100%
+
+    Function :func:`pyCreeper.crGraphs.createLinePlot`
+
+    Code examples:
+    :func:`examples.linePlots.example4_boxPlots`
+
+----------------------------
+Line plots
+----------------------------
+.. figure:: ../exampleOutput/linePlot_errorBars2.png
+    :scale: 100%
+
+    Function :func:`pyCreeper.crGraphs.createLinePlot`
+
+    Code examples:
+    :func:`examples.linePlots.example1_simple`
+    :func:`examples.linePlots.example2_multiple`
+    :func:`examples.linePlots.example3_errorBars`
+
+
+----------------------------
 Matrix plots
 ----------------------------
 .. figure:: ../exampleOutput/matrixPlot_fullAnnotations.png

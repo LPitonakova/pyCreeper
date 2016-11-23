@@ -2,6 +2,13 @@
 Code examples
 ===================================================
 
+Line plots
+--------------------------------
+
+.. automodule:: examples.linePlots
+    :members:
+    :undoc-members:
+
 Matrix plots
 --------------------------------
 

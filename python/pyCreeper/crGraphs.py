@@ -66,7 +66,7 @@ class LEGEND_POSITION(Enum):
 @unique
 class GRID_TYPE(Enum):
     """
-    Members: BEST, UPPER_RIGHT, UPPER_LEFT, LOWER_LEFT, LOWER_RIGHT, RIGHT, CENTER_LEFT, CENTER_RIGHT, LOWER_CENTER, UPPER_CENTER, CENTER
+    Members: NONE, FULL, HORIZONTAL, VERTICAL, MAJOR, MAJOR_HORIZONTAL, MAJOR_VERTICAL, MINOR, MINOR_HORIZONTAL, MINOR_VERTICAL
     """
     NONE = 0
     FULL = 1
@@ -88,10 +88,9 @@ def createLinePlot(data_,
                 title_="", xLabel_ = "", yLabel_ = "", xTickLabels_=[], legendLabels_ = [], numOfLegendColumns_ = 2, legendPosition_=LEGEND_POSITION.BEST, markers_ = [], colors_ = [],
                 showBoxPlots_=False, boxPlotWidth_=-1, showConfidenceIntervals_=False, doWilcoxon_=False,
                 lineWidth_ = 2, lineStyles_ = [], markerSize_=10, gridType_=GRID_TYPE.FULL,
-                xMin_=-INVALID_VALUE,xMax_=-INVALID_VALUE, xAxisGroupSize_ = 0, yMin_=-INVALID_VALUE, yMax_=-INVALID_VALUE, yTicksStep_ = 0, yTicksStepMultiplier_ = 1,
+                xMin_=INVALID_VALUE,xMax_=INVALID_VALUE, xAxisGroupSize_ = 0, yMin_=INVALID_VALUE, yMax_=INVALID_VALUE, yTicksStep_ = 0, yTicksStepMultiplier_ = 1,
                 titleFontSize_=INVALID_VALUE, labelFontSize_ = INVALID_VALUE, tickFontSize_ = INVALID_VALUE, legendFontSize_ = INVALID_VALUE, size_=(12,6),
                 filePath_ = "", renderFigure_=True, figure_=None, subPlot_=111):
-
 
     """
 
@@ -107,41 +106,42 @@ def createLinePlot(data_,
 
         crGraphs.createLinePlot(profitData);
 
+    :param `data_`: A 2D or a 3D list of numbers. The 0th dimension represents individual lines. The 1st dimension represents data points on the line, ordered by x coordinate. Optional 3rd dimension is a list of values that each data point consists of. A data point is then a median of that list
+    :param `title_`: (optional, default = "") The figure title
+    :param `xLabel_`: (optional, default = "") Label of the x-axis
+    :param `yLabel_`: (optional, default = "") Label of the y-axis
+    :param `xTickLabels_`: (optional, default = []) A 1D list of tick labels for the x-axis. Must be the same length as the 1st dimension of `data_`, i.e., each data point must have a corresponding `xTickLabel`
+    :param `legendLabels_`: (optional, default = []) A 1D list of labels for the individual plot lines. Must be the same length as the 0th dimension of `data_`, i.e., each plot line must have a corresponding `legendLabel`
+    :param `numOfLegendColumns_`: (optional, default = 2) A int number of columns in the legend
+    :param `legendPosition_`: (optional, default = `LEGEND_POSITION.BEST`) A :class:`.LEGEND_POSITION` enum member
+    :param `markers_`: (optional, default = []) A 1D list of markers for the plot lines. If a corresponding marker for a plot line is not specified, a marker from `DEFAULT_MARKERS` is used
+    :param `colors_`: (optional, default = []) A 1D list of colors for the plot lines. If a corresponding color for a plot line is not specified, a marker color is used
+    :param `showBoxPlots_`: (optional, default = False) A boolean that specified whether to show box plots around data points. If True, `data_` must be a 3D list
+    :param `boxPlotWidth_`: (optional, default = -1) A float that specified width of each box plot. If -1, box plot width is calculated automatically
+    :param `showConfidenceIntervals_`: (optional, default = False) A boolean that specified whether to error bars around data points. If True, `data_` must be a 3D list
+    :param `doWilcoxon_`: (optional, default = False) A boolean that specified whether to perform `Wilcoxon signed-rank test <http://en.wikipedia.org/wiki/Wilcoxon_signed-rank_test>`_ between 2 plot lines. If True, the \* notation is used next to a tick label on the x-axis where there is significant difference with p=0.05. The \*\* notation is used when there is a significant different with p=0.01. This test can only be performed when `data_` has length of 2 and is a 3D list, i.e., if it containts data for 2 plot lines and each data point represents a list of values
+    :param `lineWidth_`: (optional, default = 2) Width of the plot lines.
+    :param `lineStyles_`: (optional, default = []) A 1D list of line styles for the plot lines. If a corresponding style for a plot line is not specified, a solid line is displayed
+    :param `markerSize_`: (optional, default = 10) Size of the plot markers
+    :param `gridType_`: (optional, default = `GRID_TYPE.FULL`) A :class:`.GRID_TYPE` enum member
+    :param `xMin_`: (optional, default = `INVALID_VALUE`) Minimum value shown on the x-axis. If set to `INVALID_VALUE`, x-axis is displayed to fit the data
+    :param `xMax_`: (optional, default = `INVALID_VALUE`) Maximum value shown on the x-axis. If set to `INVALID_VALUE`, x-axis is displayed to fit the data
+    :param `xAxisGroupSize_`: (optional, default = 0) The number of data points that are joined by lines when they are next to each other on the x-axis. If set to 0, all data points are joined together. If set to > 0, groups of data points appear, with no joining lines between data points from different groups.
+    :param `yMin_`: (optional, default = `INVALID_VALUE`) Minimum value shown on the y-axis. If set to `INVALID_VALUE`, y-axis is displayed to fit the data
+    :param `yMax_`: (optional, default = `INVALID_VALUE`) Maximum value shown on the y-axis. If set to `INVALID_VALUE`, y-axis is displayed to fit the data
+    :param `yTicksStep_`: (optional, default = 0) A number that represents the different between each tick on the y-axis. If set to 0, y-axis is displayed to fit the data
+    :param `yTicksStepMultiplier_`: (optional default = 1) A number by which each tick on the y axis is multiplied by.
+    :param `titleFontSize_`: (optional, default = TITLE_FONT_SIZE) Font size of the title
+    :param `labelFontSize_`: (optional, default = LABEL_FONT_SIZE) Font size of the axis and color bar labels
+    :param `tickFontSize_`: (optional, default = TICK_FONT_SIZE) Font size of axis ticks and of values inside the plot
+    :param `legendFontSize_`: (optional, default = LABEL_FONT_SIZE) Font size of the legend
+    :param `size_`: (optional, default = (8,6)) The figure size
+    :param `filePath_`: (optional, default = "") If not empty, the figure will be saved to the file path specified. If empty, the figure will be displayed on screen instead.
+    :param `renderFigure_`: (optional, default = True) If false, the figure will not be displayed or printed. Set to False when putting multiple figures together via the `figure_` parameter.
+    :param `figure_`: (optional, default = None) If not None, the figure will be created into this figure (pylab.figure)
+    :param `subPlot_`: (optional, default = 111) The subplot id of where to place the graph to
 
-
-
-    Parameters:
-    ---------------------------------------
-
-    - data: dimension 1: line index. Dimension 2: values in those lines. Optional dim 3: list of values for 1 data point.
-    - xTickData must be 1D array of scalars, which is why we need xTickLabels as well
-
-    - legendPosition_ : a :class:`.LEGEND_POSITION` enum member
-
-
-    doWilcoxon_: Set to true to put asterix when the difference of 2 means is significant, based on the Wilcoxon signed-rank test (http://en.wikipedia.org/wiki/Wilcoxon_signed-rank_test)
-    yTicksStep_ : If > 0, the yticks will be changed so that each yTicksStep_ value is shown
-    yTicksStepMultiplier_: if yTicksStep_>0, additionally this parameter specified how the yTicksStep_ is multiplied when shown on the graph.
-    xAxisGroupSize_: if > 0, specifies how many points along the X axis will be linked by a line. E.g if xAxisGroupSize_ = 3, there will be a gap in the line between each 3rd,6th,9th,.. and 4th,7th,10th,.. point.
-
-    Example: box plots next to each other:
-    ---------------------------------------
-    If we have a parameter value we vary and a list of values for each parameter (e.g. from different runs), we
-    can plot box plots next to each other and show the parameter value along the X axis:
-    groups = [1,2,3,4,5];
-    yData = [[dataVals1,dataVals2,dataVals3,dataVals4,dataVals5]];
-    createPlot(groups,yData);
-
-    Example multiple box plots on top of each other:
-    ------------------------------------------------
-    For example for box plots, if we have 3 groups (plotted along x axis, where group is just a parameter)
-    and 2 parameter values that we want to compare, we want to plot for each group
-    2 box plots one above another. Then the box plots are connected between groups.
-
-    groups = [10,30,50];
-    yData = [   [data_10_vals1, data_30_vals1,data_50_vals1],
-                [data_10_vals2, data_30_vals2,data_50_vals2] ];
-    createPlot(groups,yData,boxPlots_=True);
+    :return: `pylab.figure` for the plot
 
     """
 
@@ -154,6 +154,9 @@ def createLinePlot(data_,
         xTickLabels_ = range(len(data_[0]));
 
     crHelpers.checkListsHaveTheSameLength(data_[0], xTickLabels_, "xTickLabels_");
+
+    if (len(legendLabels_) > 0):
+        crHelpers.checkListsHaveTheSameLength(data_, legendLabels_, "legendLabels_");
 
     crHelpers.checkVariableDataType(legendPosition_, LEGEND_POSITION);
     crHelpers.checkVariableDataType(gridType_, GRID_TYPE);
@@ -179,14 +182,7 @@ def createLinePlot(data_,
 
 
     #-- create the figure
-    yStretch = 1.05;
-    numOfLegendRows = math.ceil(len(legendLabels_) / numOfLegendColumns_);
-
-    #if (numOfLegendRows > 0):
-        #yStretch = 0.90 - numOfLegendRows*0.1;
-
-    fig, ax = createFigure(size_, title_, figure_, subPlot_, xLabel_, yLabel_, titleFontSize_, labelFontSize_, tickFontSize_, 1.2, yStretch);
-
+    fig, ax = createFigure(size_, title_, figure_, subPlot_, xLabel_, yLabel_, titleFontSize_, labelFontSize_, tickFontSize_, 1.2, 1.05);
 
     #-- prepare x tick data, which has to be scalars
     xTickData = [];
@@ -394,6 +390,11 @@ def createLinePlot(data_,
 
     #-- show legend
     if (len(legendLabels_) > 0):
+
+
+        def flip(items, ncol):
+            return itertools.chain(*[items[i::ncol] for i in range(ncol)])
+
         legendItems = [];
         for g in range(len(plots)):
             legendItems.append(plots[g][0]);
@@ -437,18 +438,18 @@ def createMatrixPlot(data_=[[],[]],
 
     :param `data_`: a 2D list of values, where the 0th dimension runs along the x axis and the 1st dimension along y axis, so [0,0] in the list specified a value for the bottom left square
     :param `title_`: (optional, default = "") The figure title
-    :param xLabel_: (optional, default = "") Label of the x-axis
-    :param yLabel_: (optional, default = "") Label of the y-axis
-    :param xTickLabels_: (optional, default = []) Labels of the individual ticks of the x-axis. If empty, values 0-N are displayed
-    :param yTickLabels_: (optional, default = []) Labels of the individual ticks of the y-axis. If empty, values 0-N are displayed
-    :param colorBarLabel_: (optional, default = "") Label of color bar, displayed vertically
-    :param colorMap_: (optional, default = "summer") A python.colormap isntance to use for the matrix plot
-    :param minValue_: (optional, default = `INVALID_VALUE`) Minimum float value that the color map considers. If set to INVALID_VALUE, the value is automatically calculated from `data_`
-    :param maxValue_: (optional, default = `INVALID_VALUE`) Maximum float value that the color map considers. If set to INVALID_VALUE, the value is automatically calculated from `data_`
-    :param annotateValues_: (optional, default = False) If True, data values will be displayed in the matrix plot
-    :param annotationStringAfter_: (optional, default = "") A string to append after each annotation value
-    :param annotationValues_: (optional, default = [[],[]]) A 2D list of annotations in the matrix plot. If non-empty, must have the same dimensions as `data_`
-    :param roundAnnotatedValues_: (optional, default = False) If True and if `annotationValues_` is empty, annotation numbers will be rounded
+    :param `xLabel_`: (optional, default = "") Label of the x-axis
+    :param `yLabel_`: (optional, default = "") Label of the y-axis
+    :param `xTickLabels_`: (optional, default = []) Labels of the individual ticks of the x-axis. If empty, values 0-N are displayed
+    :param `yTickLabels_`: (optional, default = []) Labels of the individual ticks of the y-axis. If empty, values 0-N are displayed
+    :param `colorBarLabel_`: (optional, default = "") Label of color bar, displayed vertically
+    :param `colorMap_`: (optional, default = "summer") A python.colormap isntance to use for the matrix plot
+    :param `minValue_`: (optional, default = `INVALID_VALUE`) Minimum float value that the color map considers. If set to INVALID_VALUE, the value is automatically calculated from `data_`
+    :param `maxValue_`: (optional, default = `INVALID_VALUE`) Maximum float value that the color map considers. If set to INVALID_VALUE, the value is automatically calculated from `data_`
+    :param `annotateValues_`: (optional, default = False) If True, data values will be displayed in the matrix plot
+    :param `annotationStringAfter_`: (optional, default = "") A string to append after each annotation value
+    :param `annotationValues_`: (optional, default = [[],[]]) A 2D list of annotations in the matrix plot. If non-empty, must have the same dimensions as `data_`
+    :param `roundAnnotatedValues_`: (optional, default = False) If True and if `annotationValues_` is empty, annotation numbers will be rounded
     :param `titleFontSize_`: (optional, default = TITLE_FONT_SIZE) Font size of the title
     :param `labelFontSize_`: (optional, default = LABEL_FONT_SIZE) Font size of the axis and color bar labels
     :param `tickFontSize_`: (optional, default = TICK_FONT_SIZE) Font size of axis ticks and of values inside the plot
@@ -458,7 +459,7 @@ def createMatrixPlot(data_=[[],[]],
     :param `figure_`: (optional, default = None) If not None, the figure will be created into this figure (pylab.figure)
     :param `subPlot_`: (optional, default = 111) The subplot id of where to place the graph to
 
-    :return: pylab.figure for the graph
+    :return: `pylab.figure` for the plot
     """
 
 
@@ -565,7 +566,7 @@ def createPieChart(data_=[], itemLabels_=[],
     :param `figure_`: (optional, default = None) If not None, the figure will be created into this figure (pylab.figure)
     :param `subPlot_`: (optional, default = 111) The subplot id of where to place the graph to
 
-    :return: pylab.figure
+    :return: `pylab.figure` for the plot
     """
 
     #-- test and pre-set data
@@ -705,7 +706,5 @@ def replaceInvalidWithDefaultValue(value_, defaultValue_):
         return value_;
 
 
-def flip(items, ncol):
-    return itertools.chain(*[items[i::ncol] for i in range(ncol)])
 
 
