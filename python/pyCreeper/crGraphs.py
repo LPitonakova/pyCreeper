@@ -82,13 +82,117 @@ class GRID_TYPE(Enum):
 
 
 
+def createBarChart(data_,
+                    title_="", xLabel_ = "", yLabel_ = "", xTickLabels_=[], legendLabels_ = [], numOfLegendColumns_ = 2, legendPosition_=LEGEND_POSITION.BEST, colors_ = [],
+                    showConfidenceIntervals_=False, barWidth_ = 0.35,
+                    xMin_=INVALID_VALUE, xMax_=INVALID_VALUE, xAxisGroupSize_ = 0, yMin_=INVALID_VALUE, yMax_=INVALID_VALUE, yTicksStep_ = 0, yTicksStepMultiplier_ = 1,
+                    titleFontSize_=INVALID_VALUE, labelFontSize_ = INVALID_VALUE, tickFontSize_ = INVALID_VALUE, legendFontSize_ = INVALID_VALUE, size_=(12,6),
+                    filePath_ = "", renderFigure_=True, figure_=None, subPlot_=111):
+    """
+    Create bars for groups next to each other, grouped by group labels
+    """
+
+    #-- test and pre-set data
+    numOfDataDimensions = crData.getNumberOfListDimensions(data_);
+    if (numOfDataDimensions < 2 or numOfDataDimensions > 3):
+        raise ValueError("The data_ parameter must be a 2D or a 3D list.")
+
+    if (len(xTickLabels_) == 0):
+        xTickLabels_ = range(len(data_[0]));
+
+    crHelpers.checkListsHaveTheSameLength(data_[0], xTickLabels_, "xTickLabels_");
+
+    if (len(legendLabels_) > 0):
+        crHelpers.checkListsHaveTheSameLength(data_, legendLabels_, "legendLabels_");
+
+    crHelpers.checkVariableDataType(legendPosition_, LEGEND_POSITION);
+
+    titleFontSize_ = replaceInvalidWithDefaultValue(titleFontSize_, TITLE_FONT_SIZE)
+    labelFontSize_ = replaceInvalidWithDefaultValue(labelFontSize_, LABEL_FONT_SIZE);
+    tickFontSize_ = replaceInvalidWithDefaultValue(tickFontSize_, TICK_FONT_SIZE);
+    legendFontSize_ = replaceInvalidWithDefaultValue(legendFontSize_, LABEL_FONT_SIZE);
+
+
+    xLocations = numpy.arange(len(data_[0]))  # the x locations for the groups
+
+    fig, ax = createFigure(size_, title_, figure_, subPlot_, xLabel_, yLabel_, titleFontSize_, labelFontSize_, tickFontSize_, 1.2, 1.05);
+
+    plt.xticks(xLocations+barWidth_, size=labelFontSize_);
+    ax.set_xticklabels( xTickLabels_, size=tickFontSize_);
+
+
+    #-- plot bars next to each other
+    plots = [];
+    maxVal = -999999;
+    for i in range(len(data_)):
+        #-- pick a color
+        if (len(colors_) > i):
+            colorCode = colors_[i];
+        elif (len(DEFAULT_COLORS) > i):
+            colorCode = DEFAULT_COLORS[i];
+
+        if (numOfDataDimensions == 3):
+            medians = [];
+            for q in range(len(data_[i])):
+                medians.append(numpy.median(data_[i][q]));
+            maxMedian = crData.getMaxValueInAList(medians);
+            if (maxMedian > maxVal):
+                maxVal = maxMedian;
+            if (showConfidenceIntervals_):
+                dataDof = [(len(data_[i][q])-1) for q in range(len(medians))]; #degrees of freedom is sample size -1
+                dataStd = [numpy.std(data_[i][q]) for q in range(len(medians))];
+                plot = ax.bar(xLocations+i*barWidth_, medians, barWidth_, color=colorCode, yerr=scipy.stats.t.ppf(0.95, dataDof)*dataStd); #yerr=stdData_[i]
+                plots.append(plot);
+
+            else:
+                plot = ax.bar(xLocations+i*barWidth_, medians, barWidth_, color=colorCode, yerr=scipy.stats.t.ppf(0.95, dataDof)*dataStd); #yerr=stdData_[i]
+                plots.append(plot);
+
+        else:
+            maxVal = crData.getMaxValueInAList(data_);
+            plot = ax.bar(xLocations+i*barWidth_, data_[i], barWidth_, color=colorCode); #yerr=stdData_[i]
+            plots.append(plot);
+
+    setFigureAxisLimits(ax, maxVal, xMin_, xMax_, yMin_, yMax_, yTicksStep_, yTicksStepMultiplier_);
+
+    #-- plot line for y=0
+    #pylab.plot(numpy.linspace(-0.1,N-1+0.8,3),[0,0,0],'k-');
+
+    #-- setup legend
+    #box = ax.get_position()
+    #legendItems = [];
+    #for g in range(len(plots)):
+    #    legendItems.append(plots[g][0]);
+
+    #-- show legend
+    if (len(legendLabels_) > 0):
+        def flip(items, ncol):
+            return itertools.chain(*[items[i::ncol] for i in range(ncol)])
+
+        legendItems = [];
+        for g in range(len(plots)):
+            legendItems.append(plots[g][0]);
+        legend = ax.legend(flip(legendItems, numOfLegendColumns_), flip(legendLabels_,numOfLegendColumns_),loc=legendPosition_.value, ncol=numOfLegendColumns_)
+        for t in legend.get_texts():
+            if (type(legendFontSize_) == str):
+                t.set_fontsize(legendFontSize_)
+            else:
+                font = math.QFont(t.font());
+                font.setPointSize(legendFontSize_);
+                t.setFont(font);
+
+
+    #-- display / print, return:
+    renderFigure(filePath_, renderFigure_);
+    return fig;
+
 #--------------------------------------------------------------------------------------------------------- Line plot
 
 def createLinePlot(data_,
                 title_="", xLabel_ = "", yLabel_ = "", xTickLabels_=[], legendLabels_ = [], numOfLegendColumns_ = 2, legendPosition_=LEGEND_POSITION.BEST, markers_ = [], colors_ = [],
                 showBoxPlots_=False, boxPlotWidth_=-1, showConfidenceIntervals_=False, doWilcoxon_=False,
                 lineWidth_ = 2, lineStyles_ = [], markerSize_=10, gridType_=GRID_TYPE.FULL,
-                xMin_=INVALID_VALUE,xMax_=INVALID_VALUE, xAxisGroupSize_ = 0, yMin_=INVALID_VALUE, yMax_=INVALID_VALUE, yTicksStep_ = 0, yTicksStepMultiplier_ = 1,
+                xMin_=INVALID_VALUE, xMax_=INVALID_VALUE, xAxisGroupSize_ = 0, yMin_=INVALID_VALUE, yMax_=INVALID_VALUE, yTicksStep_ = 0, yTicksStepMultiplier_ = 1,
                 titleFontSize_=INVALID_VALUE, labelFontSize_ = INVALID_VALUE, tickFontSize_ = INVALID_VALUE, legendFontSize_ = INVALID_VALUE, size_=(12,6),
                 filePath_ = "", renderFigure_=True, figure_=None, subPlot_=111):
 
@@ -339,59 +443,10 @@ def createLinePlot(data_,
         #-- make a little space
         ax.set_xlim(xTickData[0]-xTickData[-1]*0.01,xTickData[-1]+xTickData[-1]*0.01);
 
-
-    if (xMin_ > -INVALID_VALUE and xMax_ > -INVALID_VALUE):
-        ax.set_xlim(xMin_, xMax_);
-
-    if (yMin_ > -INVALID_VALUE and yMax_ > -INVALID_VALUE):
-        ax.set_ylim(yMin_, yMax_);
-
-    #-- recursively find the correct yTickStep based on the max value. The yTickStep should fit 10 times into maxVal.
-    #   then annotate the y axis.
-    if (yTicksStep_ <= 0):
-        yTicksStep_ = 1;
-        stop = False;
-
-        while (stop == False):
-            if (maxVal / yTicksStep_ <= 10):
-                stop = True;
-            else:
-                yTicksStep_ *= 10;
-
-    ticks = [];
-    ticksLabels = [];
-
-    start, stop = ax.get_ylim();
-    if (yMax_ != -INVALID_VALUE):
-        stop = yMax_;
-
-    if (yMin_ != -INVALID_VALUE):
-        start = yMin_;
-    if (yMin_ == - yMax_*0.05):
-        start = 0;
-
-    ticks = numpy.arange(start, stop + yTicksStep_, yTicksStep_);
-    ax.set_yticks(ticks);
-
-    if (yTicksStepMultiplier_ != 1):
-        for t in range(len(ticks)):
-            ticksLabels.append(ticks[t] * yTicksStepMultiplier_);
-        ax.set_yticklabels(ticksLabels);
-        ticks = ticksLabels;
-
-    ticksLabels = [];
-    for t in range(len(ticks)):
-        intVal = int(ticks[t]);
-        if (intVal >= 1000):
-            ticksLabels.append("{}k".format( intVal / 1000));
-        else:
-            ticksLabels.append(ticks[t]);
-    ax.set_yticklabels(ticksLabels);
+    setFigureAxisLimits(ax, maxVal, xMin_, xMax_, yMin_, yMax_, yTicksStep_, yTicksStepMultiplier_);
 
     #-- show legend
     if (len(legendLabels_) > 0):
-
-
         def flip(items, ncol):
             return itertools.chain(*[items[i::ncol] for i in range(ncol)])
 
@@ -640,7 +695,6 @@ def createFigure(size_, title_="", figure_=None, subPlot_=111,
                 xLabel_="", yLabel_="",
                 titleFontSize_=INVALID_VALUE, labelFontSize_=INVALID_VALUE, tickFontSize_=INVALID_VALUE,
                 xStretchMultiply_=1.2, yStretchMultiply_=1.2):
-
     """
     A helper function that creates a figure.
 
@@ -704,6 +758,69 @@ def replaceInvalidWithDefaultValue(value_, defaultValue_):
         return defaultValue_;
     else:
         return value_;
+
+
+def setFigureAxisLimits(ax_, maxDataValue_, xMin_=INVALID_VALUE, xMax_=INVALID_VALUE, yMin_=INVALID_VALUE, yMax_=INVALID_VALUE, yTicksStep_ = 0, yTicksStepMultiplier_ = 1):
+    """
+    A helper function that sets x- and y- axis limits on a figure.
+
+    :param ax_:
+    :param maxDataValue_:
+    :param xMin_:
+    :param xMax_:
+    :param yMin_:
+    :param yMax_:
+    :param yTicksStep_:
+    :param yTicksStepMultiplier_:
+    :return:
+    """
+    if (xMin_ > -INVALID_VALUE and xMax_ > -INVALID_VALUE):
+        ax_.set_xlim(xMin_, xMax_);
+
+    if (yMin_ > -INVALID_VALUE and yMax_ > -INVALID_VALUE):
+        ax_.set_ylim(yMin_, yMax_);
+
+    #-- recursively find the correct yTickStep based on the max value. The yTickStep should fit 10 times into maxDataValue_.
+    #   then annotate the y axis.
+    if (yTicksStep_ <= 0):
+        yTicksStep_ = 1;
+        stop = False;
+
+        while (stop == False):
+            if (maxDataValue_ / yTicksStep_ <= 10):
+                stop = True;
+            else:
+                yTicksStep_ *= 10;
+
+    ticks = [];
+    ticksLabels = [];
+
+    start, stop = ax_.get_ylim();
+    if (yMax_ != -INVALID_VALUE):
+        stop = yMax_;
+
+    if (yMin_ != -INVALID_VALUE):
+        start = yMin_;
+    if (yMin_ == - yMax_*0.05):
+        start = 0;
+
+    ticks = numpy.arange(start, stop + yTicksStep_, yTicksStep_);
+    ax_.set_yticks(ticks);
+
+    if (yTicksStepMultiplier_ != 1):
+        for t in range(len(ticks)):
+            ticksLabels.append(ticks[t] * yTicksStepMultiplier_);
+        ax_.set_yticklabels(ticksLabels);
+        ticks = ticksLabels;
+
+    ticksLabels = [];
+    for t in range(len(ticks)):
+        intVal = int(ticks[t]);
+        if (intVal >= 1000):
+            ticksLabels.append("{}k".format( intVal / 1000));
+        else:
+            ticksLabels.append(ticks[t]);
+    ax_.set_yticklabels(ticksLabels);
 
 
 

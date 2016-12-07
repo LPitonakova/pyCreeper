@@ -26,7 +26,6 @@ def example1_simple(saveFiles_):
 def example2_multiple(saveFiles_):
     """
     In this example, a multi-line plot is created and its custom colours and markers are specified.
-    The legend is shown underneath the graph:
 
     .. image:: ../exampleOutput/linePlot_multi.png
         :scale: 50%
