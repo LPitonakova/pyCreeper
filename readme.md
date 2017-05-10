@@ -1,33 +1,40 @@
-==================================================================================
-INSTALLING DEPENDENCIES
-==================================================================================
 
-1. Python 3.4
-------------------------------------------------------
-Make sure you have Python 3.4 installed. E.g., if you are using macports:
+INSTALLING DEPENDENCIES
+======================================
+
+
+Make sure you have Python 3.4 installed, along with matplotlib, scipy and numpy. E.g., if you are using macports:
 
 sudo port install python34
+sudo port install py34-numpy
+sudo port install py34-scipy
+sudo port install py34-matplotlib
 
 
-2. Matplotlib toolkit
-------------------------------------------------------
-Install the python 3.4 matplot lib tool kit. E.g., if you are using macports:
+INCLUDING pyCreeper IN YOUR PROJECT
+======================================
 
-sudo port install py34-matplotlib-basemap
+Include the following directory in your interpreter path:
+
+/DIRECTORY_WHERE_DOWNLOADED/pyCreeper-master/python
+
+You can then use pyCreeper in your code as
+
+import pyCreeper
+pyCreeper.crGraphs.createLinePlot(myData)
 
 
-
-==================================================================================
 VIEWING ONLINE DOCUMENTATION
-==================================================================================
+======================================
 
 The project's documentation can be found on
 http://pycreeper.lenkaspace.net/
 
 
-==================================================================================
+
+
 BUILDING DOCUMENTATION
-==================================================================================
+======================================
 
 Documentation can be built using sphinx.
 
