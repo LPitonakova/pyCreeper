@@ -7,6 +7,7 @@ Useful constants:
 * **SHOW_OUTPUT** - (default = False) Set to True to see output of the functions
 * **BASE_FILE_PATH** - (default =  "./") File path that is pre-pended to any `filePath_` parameters of the functions
 * **DPI** - (default = 100) DPI of created figures. Set to a higher number for a higher resolution.
+* **DEBUG_LEVEL** - (default = 0) O - no debug messages, 1 - some debug messages, 2 - deep debug messages
 
 To override the constants, set them after importing `crGraphs`, e.g.
 
@@ -26,6 +27,7 @@ import math;
 import numpy;
 import scipy;
 import itertools;
+import os;
 from enum import Enum, unique
 
 from . import crHelpers;
@@ -45,6 +47,8 @@ DEFAULT_COLORS = ['b','r','g','c','k'];
 DEFAULT_MARKERS = ['bs-','rs-','gs-','cs-','ks-'];
 
 INVALID_VALUE = -999999;
+
+DEBUG_LEVEL = 0;
 
 @unique
 class LEGEND_POSITION(Enum):
@@ -307,6 +311,9 @@ def createLinePlot(data_,
     plots = [];
     maxVal = -999999;
     for i in range(len(data_)):
+
+        if (DEBUG_LEVEL == 1): print("[crData] processing data row {}".format(i))
+
         legendLabel = " ";
         #-- choose a legend label
         if (len(legendLabels_) > i):
@@ -360,6 +367,9 @@ def createLinePlot(data_,
                         xTickLabels_[q] = str(xTickLabels_[q]) + "*";
 
             maxMedian = crData.getMaxValueInAList(medians);
+
+            if (DEBUG_LEVEL==1): print("[crData] medians {} max={}".format(medians,maxMedian))
+
             if (maxMedian > maxVal):
                 maxVal = maxMedian;
 
@@ -385,6 +395,8 @@ def createLinePlot(data_,
             #-- each element for a single data point is a single number. Plot directly from these numbers.
 
             maxVal = crData.getMaxValueInAList(data_);
+
+            if (DEBUG_LEVEL==1): print("[crData] max value={}".format(maxVal))
             #-- draw, in line segments
             for seg in range(numOfSegments):
                 segStart = seg * lineSegmentLength;
@@ -683,9 +695,15 @@ def renderFigure(filePath_="", renderFigure_=True):
     if (renderFigure_):
         if (len(filePath_) > 0):
             filePath_ = BASE_FILE_PATH + filePath_;
+
+            #-- create directories recursively if they don't exist
+            directoryPath = filePath_.rsplit('/', 1)[0]
+            os.makedirs(directoryPath,exist_ok=True)
+
+            #--
             pylab.savefig(filePath_, format='png')
             if (SHOW_OUTPUT == True):
-                print("Saved " + filePath_);
+                print("[crData] Saved " + filePath_);
         else:
             pylab.show()
 
@@ -730,8 +748,12 @@ def createFigure(size_, title_="", figure_=None, subPlot_=111,
     yStretchMultiply_ = yStretchMultiply_-1;
     if (title_ != ""):
         fig.suptitle(title_, fontsize=titleFontSize_);
-        xStretchMultiply_ -= 0.1;
         yStretchMultiply_ -= 0.1;
+
+    if (xLabel_ != ""):
+        yStretchMultiply_ -= 0.1;
+    if (yLabel_ != ""):
+        xStretchMultiply_ -= 0.1;
 
     box = ax.get_position();
     ax.set_position([box.x0 - box.width * (xStretchMultiply_/2), box.y0 - box.height*yStretchMultiply_/2, box.width*(1+xStretchMultiply_), box.height*(1+yStretchMultiply_)]);
@@ -774,10 +796,10 @@ def setFigureAxisLimits(ax_, maxDataValue_, xMin_=INVALID_VALUE, xMax_=INVALID_V
     :param yTicksStepMultiplier_:
     :return:
     """
-    if (xMin_ > -INVALID_VALUE and xMax_ > -INVALID_VALUE):
+    if (xMin_ > INVALID_VALUE and xMax_ > INVALID_VALUE):
         ax_.set_xlim(xMin_, xMax_);
 
-    if (yMin_ > -INVALID_VALUE and yMax_ > -INVALID_VALUE):
+    if (yMin_ > INVALID_VALUE and yMax_ > INVALID_VALUE):
         ax_.set_ylim(yMin_, yMax_);
 
     #-- recursively find the correct yTickStep based on the max value. The yTickStep should fit 10 times into maxDataValue_.
@@ -792,14 +814,16 @@ def setFigureAxisLimits(ax_, maxDataValue_, xMin_=INVALID_VALUE, xMax_=INVALID_V
             else:
                 yTicksStep_ *= 10;
 
+
     ticks = [];
     ticksLabels = [];
 
     start, stop = ax_.get_ylim();
-    if (yMax_ != -INVALID_VALUE):
+
+    if (yMax_ != INVALID_VALUE):
         stop = yMax_;
 
-    if (yMin_ != -INVALID_VALUE):
+    if (yMin_ != INVALID_VALUE):
         start = yMin_;
     if (yMin_ == - yMax_*0.05):
         start = 0;

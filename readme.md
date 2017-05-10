@@ -5,9 +5,13 @@ INSTALLING DEPENDENCIES
 
 Make sure you have Python 3.4 installed, along with matplotlib, scipy and numpy. E.g., if you are using macports:
 
+
 sudo port install python34
+
 sudo port install py34-numpy
+
 sudo port install py34-scipy
+
 sudo port install py34-matplotlib
 
 
@@ -18,9 +22,12 @@ Include the following directory in your interpreter path:
 
 /DIRECTORY_WHERE_DOWNLOADED/pyCreeper-master/python
 
+
+
 You can then use pyCreeper in your code as
 
 import pyCreeper
+
 pyCreeper.crGraphs.createLinePlot(myData)
 
 
@@ -44,7 +51,10 @@ Documentation can be built using sphinx.
 E.g., if you are using macports:
 
 sudo port install py34-sphinx
+
 sudo port select --set sphinx py34-sphinx
+
+
 
 Other examples on http://www.sphinx-doc.org/en/1.4.8/install.html
 

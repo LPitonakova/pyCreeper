@@ -115,7 +115,7 @@ def example4_boxPlots(saveFiles_):
 
 if __name__ == "__main__":
 
-    saveFiles = True;
+    saveFiles = False;
 
     example1_simple(saveFiles);
     example2_multiple(saveFiles);
