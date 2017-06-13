@@ -194,7 +194,7 @@ def createBarChart(data_,
 
 def createLinePlot(data_,
                 title_="", xLabel_ = "", yLabel_ = "", xTickLabels_=[], legendLabels_ = [], numOfLegendColumns_ = 2, legendPosition_=LEGEND_POSITION.BEST, markers_ = [], colors_ = [],
-                showBoxPlots_=False, boxPlotWidth_=-1, showConfidenceIntervals_=False, doWilcoxon_=False,
+                showBoxPlots_=False, boxPlotWidth_=-1, showConfidenceIntervals_=False, showAverages_=False, doWilcoxon_=False,
                 lineWidth_ = 2, lineStyles_ = [], markerSize_=10, gridType_=GRID_TYPE.FULL,
                 xMin_=INVALID_VALUE, xMax_=INVALID_VALUE, xAxisGroupSize_ = 0, yMin_=INVALID_VALUE, yMax_=INVALID_VALUE, yTicksStep_ = 0, yTicksStepMultiplier_ = 1,
                 titleFontSize_=INVALID_VALUE, labelFontSize_ = INVALID_VALUE, tickFontSize_ = INVALID_VALUE, legendFontSize_ = INVALID_VALUE, size_=(12,6),
@@ -227,6 +227,7 @@ def createLinePlot(data_,
     :param `showBoxPlots_`: (optional, default = False) A boolean that specified whether to show box plots around data points. If True, `data_` must be a 3D list
     :param `boxPlotWidth_`: (optional, default = -1) A float that specified width of each box plot. If -1, box plot width is calculated automatically
     :param `showConfidenceIntervals_`: (optional, default = False) A boolean that specified whether to error bars around data points. If True, `data_` must be a 3D list
+    :param `showAverages_`: (optional, default = False) A boolean that specifies whether to show averages instead of medians as data points. If True, `data_` must be a 3D list
     :param `doWilcoxon_`: (optional, default = False) A boolean that specified whether to perform `Wilcoxon signed-rank test <http://en.wikipedia.org/wiki/Wilcoxon_signed-rank_test>`_ between 2 plot lines. If True, the \* notation is used next to a tick label on the x-axis where there is significant difference with p=0.05. The \*\* notation is used when there is a significant different with p=0.01. This test can only be performed when `data_` has length of 2 and is a 3D list, i.e., if it containts data for 2 plot lines and each data point represents a list of values
     :param `lineWidth_`: (optional, default = 2) Width of the plot lines.
     :param `lineStyles_`: (optional, default = []) A 1D list of line styles for the plot lines. If a corresponding style for a plot line is not specified, a solid line is displayed
@@ -274,6 +275,9 @@ def createLinePlot(data_,
     tickFontSize_ = replaceInvalidWithDefaultValue(tickFontSize_, TICK_FONT_SIZE);
     legendFontSize_ = replaceInvalidWithDefaultValue(legendFontSize_, LABEL_FONT_SIZE);
 
+    if (showAverages_):
+        showBoxPlots_ = False;
+        showConfidenceIntervals_ = False;
 
     if (doWilcoxon_):
         if (len(data_) != 2):
@@ -287,6 +291,9 @@ def createLinePlot(data_,
         print ("!!! Cannot draw box plots: each plot's data point represented by data_ must be a list, i.e., data_ must be a 3D list.");
     if (showConfidenceIntervals_ and numOfDataDimensions < 3):
         print ("!!! Cannot draw confidence intervals: each plot's data point represented by data_ must be a list, i.e., data_ must be a 3D list.");
+    if (showAverages_ and numOfDataDimensions < 3):
+        print ("!!! Cannot show averages: each plot's data point represented by data_ must be a list, i.e., data_ must be a 3D list.");
+
 
 
     #-- create the figure
@@ -355,9 +362,13 @@ def createLinePlot(data_,
             #-- each element for a single data point is a list.
             #-- only plot median of data that is a list. Box plots can be added later if set
             #-- get medians one by one, as numpy can't deal with lists of different lengths
-            medians = [];
+            dataPoints = [];
             for q in range(len(data_[i])):
-                medians.append(numpy.median(data_[i][q]));
+                if (showAverages_):
+                    print("MEAN {}".format(numpy.mean(data_[i][q])))
+                    dataPoints.append(numpy.mean(data_[i][q]));
+                else:
+                    dataPoints.append(numpy.median(data_[i][q]));
                 if (doWilcoxon_ and i == 1):
                     #-- do the Wilcoxon test on individual samples (that together form a median) and compare them to runs of previous data set:
                     pVal = scipy.stats.wilcoxon(data_[i][q],data_[0][q])[1];
@@ -366,17 +377,17 @@ def createLinePlot(data_,
                     elif (pVal < 0.05):
                         xTickLabels_[q] = str(xTickLabels_[q]) + "*";
 
-            maxMedian = crData.getMaxValueInAList(medians);
+            maxMedian = crData.getMaxValueInAList(dataPoints);
 
-            if (DEBUG_LEVEL==1): print("[crData] medians {} max={}".format(medians,maxMedian))
+            if (DEBUG_LEVEL==1): print("[crData] medians {} max={}".format(dataPoints,maxMedian))
 
             if (maxMedian > maxVal):
                 maxVal = maxMedian;
 
             if (showConfidenceIntervals_):
-                dataDof = [(len(data_[i][q])-1) for q in range(len(medians))]; #degrees of freedom is sample size -1
-                dataStd = [numpy.std(data_[i][q]) for q in range(len(medians))];
-                (_, caps, _) = plt.errorbar(xTickData, medians, yerr=scipy.stats.t.ppf(0.95, dataDof)*dataStd, color=color, linewidth=0, elinewidth=lineWidth_, capsize=markerSize_-2, linestyle=lineStyle);
+                dataDof = [(len(data_[i][q])-1) for q in range(len(dataPoints))]; #degrees of freedom is sample size -1
+                dataStd = [numpy.std(data_[i][q]) for q in range(len(dataPoints))];
+                (_, caps, _) = plt.errorbar(xTickData, dataPoints, yerr=scipy.stats.t.ppf(0.95, dataDof)*dataStd, color=color, linewidth=0, elinewidth=lineWidth_, capsize=markerSize_-2, linestyle=lineStyle);
                 for cap in caps:
                     if (lineWidth_ == 0):
                         cap.set_markeredgewidth(3);
@@ -389,7 +400,7 @@ def createLinePlot(data_,
                 segEnd = segStart + lineSegmentLength;
                 if (segEnd > len(xTickData)):
                     segEnd = len(xTickData-1);
-                plot = pylab.plot(xTickData[segStart:segEnd], medians[segStart:segEnd], marker, color=color, label = legendLabel, linewidth=lineWidth_, linestyle=lineStyle, markersize=markerSize_);
+                plot = pylab.plot(xTickData[segStart:segEnd], dataPoints[segStart:segEnd], marker, color=color, label = legendLabel, linewidth=lineWidth_, linestyle=lineStyle, markersize=markerSize_);
 
         else:
             #-- each element for a single data point is a single number. Plot directly from these numbers.
