@@ -365,7 +365,6 @@ def createLinePlot(data_,
             dataPoints = [];
             for q in range(len(data_[i])):
                 if (showAverages_):
-                    print("MEAN {}".format(numpy.mean(data_[i][q])))
                     dataPoints.append(numpy.mean(data_[i][q]));
                 else:
                     dataPoints.append(numpy.median(data_[i][q]));
