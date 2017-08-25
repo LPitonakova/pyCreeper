@@ -39,9 +39,9 @@ SHOW_OUTPUT = True;
 BASE_FILE_PATH = "./";
 DPI = 100;
 
-TITLE_FONT_SIZE = 'xx-large';
-LABEL_FONT_SIZE = 'xx-large';
-TICK_FONT_SIZE = "large";
+TITLE_FONT_SIZE = '21';
+LABEL_FONT_SIZE = '21';
+TICK_FONT_SIZE = "14";
 
 DEFAULT_COLORS = ['b','r','g','c','k'];
 DEFAULT_MARKERS = ['bs-','rs-','gs-','cs-','ks-'];
@@ -52,9 +52,6 @@ DEBUG_LEVEL = 0;
 
 @unique
 class LEGEND_POSITION(Enum):
-    """
-    Members: BEST, UPPER_RIGHT, UPPER_LEFT, LOWER_LEFT, LOWER_RIGHT, RIGHT, CENTER_LEFT, CENTER_RIGHT, LOWER_CENTER, UPPER_CENTER, CENTER
-    """
     BEST = "best"
     UPPER_RIGHT = "upper right"
     UPPER_LEFT = "upper left"
@@ -69,9 +66,6 @@ class LEGEND_POSITION(Enum):
 
 @unique
 class GRID_TYPE(Enum):
-    """
-    Members: NONE, FULL, HORIZONTAL, VERTICAL, MAJOR, MAJOR_HORIZONTAL, MAJOR_VERTICAL, MINOR, MINOR_HORIZONTAL, MINOR_VERTICAL
-    """
     NONE = 0
     FULL = 1
     HORIZONTAL = 2
@@ -104,10 +98,10 @@ def createBarChart(data_,
     if (len(xTickLabels_) == 0):
         xTickLabels_ = range(len(data_[0]));
 
-    crHelpers.checkListsHaveTheSameLength(data_[0], xTickLabels_, "xTickLabels_");
+    crHelpers.checkListsHaveTheSameLength(data_[0], xTickLabels_);
 
     if (len(legendLabels_) > 0):
-        crHelpers.checkListsHaveTheSameLength(data_, legendLabels_, "legendLabels_");
+        crHelpers.checkListsHaveTheSameLength(data_, legendLabels_);
 
     crHelpers.checkVariableDataType(legendPosition_, LEGEND_POSITION);
 
@@ -262,10 +256,10 @@ def createLinePlot(data_,
     if (len(xTickLabels_) == 0):
         xTickLabels_ = range(len(data_[0]));
 
-    crHelpers.checkListsHaveTheSameLength(data_[0], xTickLabels_, "xTickLabels_");
+    crHelpers.checkListsHaveTheSameLength(data_[0], xTickLabels_);
 
     if (len(legendLabels_) > 0):
-        crHelpers.checkListsHaveTheSameLength(data_, legendLabels_, "legendLabels_");
+        crHelpers.checkListsHaveTheSameLength(data_, legendLabels_);
 
     crHelpers.checkVariableDataType(legendPosition_, LEGEND_POSITION);
     crHelpers.checkVariableDataType(gridType_, GRID_TYPE);
@@ -424,17 +418,20 @@ def createLinePlot(data_,
             pylab.setp(boxPlot['boxes'], color=color);
             pylab.setp(boxPlot['whiskers'], color=color);
             pylab.setp(boxPlot['medians'], color=color);
-            pylab.setp(boxPlot['fliers'], color=color);
+            pylab.setp(boxPlot['fliers'], color=color, marker="+");
             pylab.setp(boxPlot['caps'], color=color);
 
-            boxPlotLineWidth = 1;
+            boxPlotLineWidth = min(lineWidth_,2);
             if (boxPlotLineWidth <= 0):
                 boxPlotLineWidth = 1;
+
             for box in boxPlot['boxes']:
                 box.set(linewidth=boxPlotLineWidth)
             for median in boxPlot['medians']:
                 median.set(linewidth=boxPlotLineWidth)
             for cap in boxPlot['caps']:
+                cap.set(linewidth=boxPlotLineWidth)
+            for cap in boxPlot['whiskers']:
                 cap.set(linewidth=boxPlotLineWidth)
 
             #-- reapply x ticks labels
@@ -455,7 +452,7 @@ def createLinePlot(data_,
         elif (gridType_ == GRID_TYPE.MINOR or gridType_ == GRID_TYPE.MINOR_HORIZONTAL or gridType_ == GRID_TYPE.MINOR_VERTICAL):
             gridWhich = 'minor';
 
-        ax.grid(which=gridWhich, axis=gridAxis);
+        ax.grid(which=gridWhich, axis=gridAxis, linestyle=":");
 
     #-- adjust x axis and y axis limits:
     if (showBoxPlots_ or showConfidenceIntervals_):
@@ -547,9 +544,9 @@ def createMatrixPlot(data_=[[],[]],
     crHelpers.checkVariableIsList(annotationValues_,2);
 
     if (len(xTickLabels_) > 0):
-        crHelpers.checkListsHaveTheSameLength(data_[1], xTickLabels_, "xTickLabels_");
+        crHelpers.checkListsHaveTheSameLength(data_[1], xTickLabels_);
     if (len(yTickLabels_) > 0):
-        crHelpers.checkListsHaveTheSameLength(data_, yTickLabels_, "yTickLabels_");
+        crHelpers.checkListsHaveTheSameLength(data_, yTickLabels_);
 
     labelFontSize_ = replaceInvalidWithDefaultValue(labelFontSize_, LABEL_FONT_SIZE);
     tickFontSize_ = replaceInvalidWithDefaultValue(tickFontSize_, TICK_FONT_SIZE);
@@ -651,10 +648,10 @@ def createPieChart(data_=[], itemLabels_=[],
     crHelpers.checkVariableIsList(itemLabels_,True);
     crHelpers.checkVariableIsList(itemColors_);
 
-    crHelpers.checkListsHaveTheSameLength(data_, itemLabels_, "itemLabels_");
+    crHelpers.checkListsHaveTheSameLength(data_, itemLabels_);
 
     if (len(itemColors_) > 0):
-        crHelpers.checkListsHaveTheSameLength(data_, itemColors_, "itemColors_");
+        crHelpers.checkListsHaveTheSameLength(data_, itemColors_);
 
     itemsFontSize_ = replaceInvalidWithDefaultValue(itemsFontSize_, LABEL_FONT_SIZE);
     valuesFontSize_ = replaceInvalidWithDefaultValue(valuesFontSize_, TICK_FONT_SIZE);
@@ -793,19 +790,7 @@ def replaceInvalidWithDefaultValue(value_, defaultValue_):
 
 
 def setFigureAxisLimits(ax_, maxDataValue_, xMin_=INVALID_VALUE, xMax_=INVALID_VALUE, yMin_=INVALID_VALUE, yMax_=INVALID_VALUE, yTicksStep_ = 0, yTicksStepMultiplier_ = 1):
-    """
-    A helper function that sets x- and y- axis limits on a figure.
 
-    :param ax_:
-    :param maxDataValue_:
-    :param xMin_:
-    :param xMax_:
-    :param yMin_:
-    :param yMax_:
-    :param yTicksStep_:
-    :param yTicksStepMultiplier_:
-    :return:
-    """
     if (xMin_ > INVALID_VALUE and xMax_ > INVALID_VALUE):
         ax_.set_xlim(xMin_, xMax_);
 
@@ -855,6 +840,33 @@ def setFigureAxisLimits(ax_, maxDataValue_, xMin_=INVALID_VALUE, xMax_=INVALID_V
         else:
             ticksLabels.append(ticks[t]);
     ax_.set_yticklabels(ticksLabels);
+
+
+
+def getBrokenLinePlotParameters(yMin_, brokenLineY_, yMax_, brokenLinePlotHeightPercentage_ = 60):
+    """
+    Get y-axis parameters of two plots, bottom and top, that can be combined together into a broken line plot.
+
+    :param yMin_:  Minimum value shown on the y-axis.
+    :param brokenLineY_: Y-axis value at which the broken line will be drawn
+    :param yMax_: Maximum value shown on the y-axis.
+    :param brokenLinePlotHeightPercentage_: (optional, default = 60) The percentage (20-80) of the plot's height at which the broken line will be drawn
+
+    :return: (bottom plot y min,  bottom plot y max, top plot y min, top plot y max)
+    """
+    crHelpers.checkVariableGreaterThanAnother(brokenLineY_,yMin_);
+    crHelpers.checkVariableGreaterThanAnother(yMax_,yMin_);
+    crHelpers.checkVariableGreaterThanAnother(yMax_,brokenLineY_);
+    crHelpers.checkVariableBetweenValues(brokenLinePlotHeightPercentage_,20,80);
+
+    brokenLinePlotHeightMultiplier = brokenLinePlotHeightPercentage_ / 100.0;
+
+    zoomedInPlotRange = brokenLineY_ - yMin_;
+    finalPlotRange = yMax_ - yMin_;
+    zoomedInPlotYMax =  zoomedInPlotRange * 1/brokenLinePlotHeightMultiplier; # the broken line breaks at N% of the figure height
+    zoomedOutPlotYMin = yMax_ - ((finalPlotRange - brokenLineY_) * (1/(1-brokenLinePlotHeightMultiplier)))
+
+    return (yMin_, zoomedInPlotYMax, zoomedOutPlotYMin, yMax_);
 
 
 

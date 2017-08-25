@@ -1,6 +1,6 @@
 
 
-.. image:: pyCreeperLogo.png
+.. image:: images/pyCreeperLogo.png
     :width: 220 px
     :align: left
 
@@ -23,6 +23,7 @@ Contents
 
     supportedGraphs
     examples
+    advanced_brokenLinePlots
     api
 
 About

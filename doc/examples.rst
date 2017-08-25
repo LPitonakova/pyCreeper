@@ -2,7 +2,7 @@
 Code examples
 ===================================================
 
-Line plots
+Line plot
 --------------------------------
 
 .. automodule:: examples.linePlots

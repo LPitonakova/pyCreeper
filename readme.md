@@ -62,7 +62,11 @@ Other examples on http://www.sphinx-doc.org/en/1.4.8/install.html
 2. Install the rtd theme via:
 ------------------------------------------------------
 
-pip install sphinx_rtd_theme
+sudo port install py34-sphinx_rtd_theme
+
+
+
+(Make sure to install the 0.2.4 version if using the theme with Python 3.4!)
 
 
 3. Build
