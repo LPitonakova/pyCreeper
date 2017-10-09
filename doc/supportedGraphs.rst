@@ -25,6 +25,7 @@ Line plots
     :func:`examples.linePlots.example1_simple`
     :func:`examples.linePlots.example2_multiple`
     :func:`examples.linePlots.example3_errorBars`
+    :func:`examples.linePlots.example4_boxPlots`
 
 
 ----------------------------

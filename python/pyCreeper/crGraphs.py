@@ -415,13 +415,15 @@ def createLinePlot(data_,
         #-- do box plots
         if (showBoxPlots_):
             boxPlot = pylab.boxplot(data_[i],positions=xTickData,widths=boxPlotWidth_);
+            boxPlotLineWidth = min(lineWidth_,2);
+
             pylab.setp(boxPlot['boxes'], color=color);
             pylab.setp(boxPlot['whiskers'], color=color);
             pylab.setp(boxPlot['medians'], color=color);
-            pylab.setp(boxPlot['fliers'], color=color, marker="+");
+            pylab.setp(boxPlot['fliers'], markeredgecolor=color, marker="+", markerSize = max(6,markerSize_*0.7),markerEdgeWidth=max(1,boxPlotLineWidth));
             pylab.setp(boxPlot['caps'], color=color);
 
-            boxPlotLineWidth = min(lineWidth_,2);
+
             if (boxPlotLineWidth <= 0):
                 boxPlotLineWidth = 1;
 
