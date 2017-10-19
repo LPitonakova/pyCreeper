@@ -89,7 +89,7 @@ def getMaxValueInAList(list_):
         raise NotImplementedError("crData.getMaxValueInAList() has not been implemented for more than 2-dimensional lists.")
 
 
-def getArrayByFlippingColumnsAndRows(array_):
+def getListByFlippingColumnsAndRows(array_):
     """
     Return array that has rows with columns flipped
 
@@ -145,102 +145,91 @@ def getMedianOfAList(list_, ignoreZeros_ = False):
         else:
             return theValues[0];
 
-def compressTimeSeriesData(data_, timeBinLength_, isTimeFirstDimension_=True, useAverages_ = True, discardZerosFromAverages_ = False, debug_=False):
+def compressList(data_, timeBinLength_, useAverages_ = True, discardZerosFromAverages_ = False, debug_=False):
     """
-    Compress 2D data that has one dimension as time and another as something else by aggregating data into time bins.
+    Compress a list by aggregating data into bins.
 
     For example:
 
     .. code-block:: python
 
-        realTimeData = [
-                [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-                [10, 9, 8, 7, 6, 5, 4, 3, 2, 1]
-        ];
+        realTimeData = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
-        compressedData = pyCreeper.crData.compressTimeSeriesData(realTimeData,3,isTimeFirstDimension_=False)
+        compressedData = pyCreeper.crData.compressList(realTimeData,3)
         print(compressedData)
 
-        [out:] [[2.0, 9.0], [5.0, 6.0], [8.0, 3.0], [3.3333333333333335, 0.3333333333333333]]
+        [out:] [2.0, 5.0, 8.0, 3.3333333333333335]
 
     :param data_: 2D array
     :param timeBinLength_: length of one time bin (number of time bins of the uncompressed data)
-    :param isTimeFirstDimension_: (optional, default = True) If true, the 0th dimension of `data_` should represent time
-    :param useAverages_: (optional, default = True) If true, the compressed value in each time bin will be an average of values of the uncompressed data. If false, sum of uncompressed data values is used.
+    :param useAverages_: (optional, default = True) If true, the compressed value in each bin will be an average of values of the uncompressed data. If false, sum of uncompressed data values will be used.
     :param discardZerosFromAverages_: (optional, default = False) If true, averages calculated when useAverages_=True do not take 0s into account
     :param debug_: (optional, default = False) If true, extra debug info is printed
 
-    :return: 2D array where 0th dimension is compressed time and 1st dimension is the compressed data values
+    :return: A compressed list
     """
+
+    # Note: in the below code, "time" is synonymous to the dimension to compress
 
     if (debug_):
         print("sample down using time bin length " + str(timeBinLength_))
         print("Original data:")
         print(data_);
 
-    otherDimLength = 0;
-    if (isTimeFirstDimension_):
-        otherDimLength = len(data_[0]);
-        endTime = len(data_)
-    else:
-        otherDimLength = len(data_);
-        endTime = (len(data_[0]));
-
+    endTime = len(data_)
 
 
     numOfTimeBins = int(endTime / timeBinLength_);
     if (numOfTimeBins*timeBinLength_ < endTime):
         numOfTimeBins += 1;
 
-    returnData = [[0 for r in range(otherDimLength)] for i in range(numOfTimeBins)];
-    for i in range(otherDimLength):
-        accumulatedVal = 0;
+    returnData = [0 for i in range(numOfTimeBins)];
 
-        timeBinNumOfNonZeroValues = 0;
-        binEndTime = endTime;
-        for t in range(binEndTime):
-            timeBin = int(math.floor(t / timeBinLength_));
-            startTime = timeBin * timeBinLength_;
-            binEndTime = min(endTime-1, startTime + timeBinLength_ - 1);
+    accumulatedVal = 0;
 
-            if (t == startTime):
-                timeBinNumOfNonZeroValues = 0;
-                accumulatedVal = 0;
-                if (debug_):
-                    print("Time bin start at t={}".format(t))
+    timeBinNumOfNonZeroValues = 0;
+    binEndTime = endTime;
+    for t in range(binEndTime):
+        timeBin = int(math.floor(t / timeBinLength_));
+        startTime = timeBin * timeBinLength_;
+        binEndTime = min(endTime-1, startTime + timeBinLength_ - 1);
 
-            valueToAdd = 0;
-            try:
-                if (isTimeFirstDimension_):
-                    valueToAdd = data_[t][i];
-                else:
-                    valueToAdd = data_[i][t];
-            except IndexError:
-                pass
-                #raise IndexError("!!!!!! index {} t {}  no value".format(i,t) )
+        if (t == startTime):
+            timeBinNumOfNonZeroValues = 0;
+            accumulatedVal = 0;
+            if (debug_):
+                print("Time bin start at t={}".format(t))
+
+        valueToAdd = 0;
+        try:
+            valueToAdd = data_[t];
+        except IndexError:
+            pass
 
 
-            if (valueToAdd != 0):
-                timeBinNumOfNonZeroValues += 1;
+        if (valueToAdd != 0):
+            timeBinNumOfNonZeroValues += 1;
 
-            accumulatedVal += valueToAdd;
+        accumulatedVal += valueToAdd;
+        if (debug_):
             print("t {} endTime {} val {}".format(t, binEndTime, accumulatedVal));
-            if (t == binEndTime):
-                #-- end of time bin, take average and note it into output array
-                if (useAverages_):
-                    if (discardZerosFromAverages_):
-                        if (timeBinNumOfNonZeroValues > 0):
-                            returnData[timeBin][i] = accumulatedVal / float(timeBinNumOfNonZeroValues);
-                        else:
-                            returnData[timeBin][i] = 0;
-                    else:
-                        returnData[timeBin][i] = accumulatedVal / float(timeBinLength_);
-                else:
-                    returnData[timeBin][i] = accumulatedVal;
 
-                if (debug_):
-                    if (returnData[timeBin][i] != 0):
-                        print("t = {} return val={} num of non zero vals={} total val={} ".format(t, returnData[timeBin][i], timeBinNumOfNonZeroValues, accumulatedVal));
+        if (t == binEndTime):
+            #-- end of time bin, take average and note it into output array
+            if (useAverages_):
+                if (discardZerosFromAverages_):
+                    if (timeBinNumOfNonZeroValues > 0):
+                        returnData[timeBin] = accumulatedVal / float(timeBinNumOfNonZeroValues);
+                    else:
+                        returnData[timeBin]= 0;
+                else:
+                    returnData[timeBin] = accumulatedVal / float(timeBinLength_);
+            else:
+                returnData[timeBin] = accumulatedVal;
+
+            if (debug_):
+                if (returnData[timeBin] != 0):
+                    print("t = {} return val={} num of non zero vals={} total val={} ".format(t, returnData[timeBin], timeBinNumOfNonZeroValues, accumulatedVal));
 
 
     return returnData;
