@@ -12,11 +12,17 @@ Creating figures:
 * :func:`pyCreeper.crGraphs.createMatrixPlot`
 * :func:`pyCreeper.crGraphs.createPieChart`
 
-Working with lists:
+Working with arrays:
 
+* :func:`pyCreeper.crData.getMedianOfAList`
 * :func:`pyCreeper.crData.getMaxValueInAList`
 * :func:`pyCreeper.crData.getMinValueInAList`
 * :func:`pyCreeper.crData.getNumberOfListDimensions`
+
+Advanced working with arrays:
+
+* :func:`pyCreeper.crData.compressList`
+* :func:`pyCreeper.crData.getListByFlippingColumnsAndRows`
 
 
 --------------------

@@ -2,21 +2,22 @@
 Code examples
 ===================================================
 
-Line and box plots
+
+Line and box plot examples
 --------------------------------
 
 .. automodule:: examples.linePlots
     :members:
     :undoc-members:
 
-Matrix plots
+Matrix plot examples
 --------------------------------
 
 .. automodule:: examples.matrixPlots
     :members:
     :undoc-members:
 
-Pie charts
+Pie chart examples
 --------------------------------
 
 .. automodule:: examples.pieCharts
