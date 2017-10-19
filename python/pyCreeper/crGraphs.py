@@ -87,7 +87,7 @@ def createBarChart(data_,
                     titleFontSize_=INVALID_VALUE, labelFontSize_ = INVALID_VALUE, tickFontSize_ = INVALID_VALUE, legendFontSize_ = INVALID_VALUE, size_=(12,6),
                     filePath_ = "", renderFigure_=True, figure_=None, subPlot_=111):
     """
-    Create bars for groups next to each other, grouped by group labels
+    Create bars for groups next to each other, grouped by group labels. [Work in progress]
     """
 
     #-- test and pre-set data
@@ -121,7 +121,8 @@ def createBarChart(data_,
 
     #-- plot bars next to each other
     plots = [];
-    maxVal = -999999;
+    maxVal = -9999999;
+    minVal = 9999999;
     for i in range(len(data_)):
         #-- pick a color
         if (len(colors_) > i):
@@ -133,9 +134,13 @@ def createBarChart(data_,
             medians = [];
             for q in range(len(data_[i])):
                 medians.append(numpy.median(data_[i][q]));
-            maxMedian = crData.getMaxValueInAList(medians);
-            if (maxMedian > maxVal):
-                maxVal = maxMedian;
+
+                for r in range(len(data_[i][q])):
+                    if (data_[i][q][r] > maxVal):
+                        maxVal = data_[i][q][r];
+                    if (data_[i][q][r] < minVal):
+                        minVal = data_[i][q][r]
+
             if (showConfidenceIntervals_):
                 dataDof = [(len(data_[i][q])-1) for q in range(len(medians))]; #degrees of freedom is sample size -1
                 dataStd = [numpy.std(data_[i][q]) for q in range(len(medians))];
@@ -148,10 +153,11 @@ def createBarChart(data_,
 
         else:
             maxVal = crData.getMaxValueInAList(data_);
+            minVal = crData.getMinValueInAList(data_);
             plot = ax.bar(xLocations+i*barWidth_, data_[i], barWidth_, color=colorCode); #yerr=stdData_[i]
             plots.append(plot);
 
-    setFigureAxisLimits(ax, maxVal, xMin_, xMax_, yMin_, yMax_, yTicksStep_, yTicksStepMultiplier_);
+    setFigureAxisLimits(ax, minVal, maxVal, xMin_, xMax_, yMin_, yMax_, yTicksStep_, yTicksStepMultiplier_);
 
     #-- plot line for y=0
     #pylab.plot(numpy.linspace(-0.1,N-1+0.8,3),[0,0,0],'k-');
@@ -253,10 +259,11 @@ def createLinePlot(data_,
     if (numOfDataDimensions < 2 or numOfDataDimensions > 3):
         raise ValueError("The data_ parameter must be a 2D or a 3D list.")
 
-    if (len(xTickLabels_) == 0):
-        xTickLabels_ = range(len(data_[0]));
+    xTickLabels = xTickLabels_.copy();
+    if (len(xTickLabels) == 0):
+        xTickLabels = range(len(data_[0]));
 
-    crHelpers.checkListsHaveTheSameLength(data_[0], xTickLabels_);
+    crHelpers.checkListsHaveTheSameLength(data_[0], xTickLabels);
 
     if (len(legendLabels_) > 0):
         crHelpers.checkListsHaveTheSameLength(data_, legendLabels_);
@@ -295,12 +302,12 @@ def createLinePlot(data_,
 
     #-- prepare x tick data, which has to be scalars
     xTickData = [];
-    if (type(xTickLabels_) == int):
-        #-- xTickLabels_ are numbers, ok to use for plotting
-        xTickData = xTickLabels_;
+    if (type(xTickLabels) == int):
+        #-- xTickLabels are numbers, ok to use for plotting
+        xTickData = xTickLabels;
     else:
-        #-- xTickLabels_ are strings, the xTickData must be an array from 0-length of xTickLabels_
-        xTickData = range(len(xTickLabels_));
+        #-- xTickLabels are strings, the xTickData must be an array from 0-length of xTickLabels
+        xTickData = range(len(xTickLabels));
 
 
     #-- prepare box plot width
@@ -310,10 +317,11 @@ def createLinePlot(data_,
 
     #-- do the potting
     plots = [];
-    maxVal = -999999;
+    maxVal = -9999999;
+    minVal = 9999999;
     for i in range(len(data_)):
 
-        if (DEBUG_LEVEL == 1): print("[crData] processing data row {}".format(i))
+        if (DEBUG_LEVEL >= 1): print("[crData] processing data row {}".format(i))
 
         legendLabel = " ";
         #-- choose a legend label
@@ -339,13 +347,13 @@ def createLinePlot(data_,
             lineStyle = '';
 
         #-- apply custom x tick labels
-        if (len(xTickLabels_) > 0):
-            plt.xticks(xTickData, xTickLabels_);
+        if (len(xTickLabels) > 0):
+            plt.xticks(xTickData, xTickLabels);
 
         #-- find out how many line segments
         numOfSegments = 0;
         lineSegmentLength = xAxisGroupSize_;
-        if (xAxisGroupSize_ > 0):
+        if (xAxisGroupSize_ > 0 and xAxisGroupSize_ <= len(xTickData)):
             numOfSegments = int(math.ceil(len(xTickData) / xAxisGroupSize_));
         else:
             numOfSegments = 1;
@@ -366,16 +374,15 @@ def createLinePlot(data_,
                     #-- do the Wilcoxon test on individual samples (that together form a median) and compare them to runs of previous data set:
                     pVal = scipy.stats.wilcoxon(data_[i][q],data_[0][q])[1];
                     if (pVal < 0.01):
-                        xTickLabels_[q] = str(xTickLabels_[q]) + "**";
+                        xTickLabels[q] = str(xTickLabels[q]) + "**";
                     elif (pVal < 0.05):
-                        xTickLabels_[q] = str(xTickLabels_[q]) + "*";
+                        xTickLabels[q] = str(xTickLabels[q]) + "*";
 
-            maxMedian = crData.getMaxValueInAList(dataPoints);
-
-            if (DEBUG_LEVEL==1): print("[crData] medians {} max={}".format(dataPoints,maxMedian))
-
-            if (maxMedian > maxVal):
-                maxVal = maxMedian;
+                for r in range(len(data_[i][q])):
+                    if (data_[i][q][r] > maxVal):
+                        maxVal = data_[i][q][r];
+                    if (data_[i][q][r] < minVal):
+                        minVal = data_[i][q][r]
 
             if (showConfidenceIntervals_):
                 dataDof = [(len(data_[i][q])-1) for q in range(len(dataPoints))]; #degrees of freedom is sample size -1
@@ -399,8 +406,8 @@ def createLinePlot(data_,
             #-- each element for a single data point is a single number. Plot directly from these numbers.
 
             maxVal = crData.getMaxValueInAList(data_);
+            minVal = crData.getMinValueInAList(data_);
 
-            if (DEBUG_LEVEL==1): print("[crData] max value={}".format(maxVal))
             #-- draw, in line segments
             for seg in range(numOfSegments):
                 segStart = seg * lineSegmentLength;
@@ -437,7 +444,7 @@ def createLinePlot(data_,
                 cap.set(linewidth=boxPlotLineWidth)
 
             #-- reapply x ticks labels
-            ax.set_xticklabels(xTickLabels_);
+            ax.set_xticklabels(xTickLabels);
 
 
     #-- grid
@@ -464,7 +471,8 @@ def createLinePlot(data_,
         #-- make a little space
         ax.set_xlim(xTickData[0]-xTickData[-1]*0.01,xTickData[-1]+xTickData[-1]*0.01);
 
-    setFigureAxisLimits(ax, maxVal, xMin_, xMax_, yMin_, yMax_, yTicksStep_, yTicksStepMultiplier_);
+    if (DEBUG_LEVEL>=1): print("[crData] min data value={}    max data value={}".format(minVal,maxVal))
+    setFigureAxisLimits(ax, minVal, maxVal, xMin_, xMax_, yMin_, yMax_, yTicksStep_, yTicksStepMultiplier_);
 
     #-- show legend
     if (len(legendLabels_) > 0):
@@ -791,37 +799,43 @@ def replaceInvalidWithDefaultValue(value_, defaultValue_):
         return value_;
 
 
-def setFigureAxisLimits(ax_, maxDataValue_, xMin_=INVALID_VALUE, xMax_=INVALID_VALUE, yMin_=INVALID_VALUE, yMax_=INVALID_VALUE, yTicksStep_ = 0, yTicksStepMultiplier_ = 1):
+def setFigureAxisLimits(ax_, minDataValue_, maxDataValue_, xMin_=INVALID_VALUE, xMax_=INVALID_VALUE, yMin_=INVALID_VALUE, yMax_=INVALID_VALUE, yTicksStep_ = 0, yTicksStepMultiplier_ = 1):
 
-    if (xMin_ > INVALID_VALUE and xMax_ > INVALID_VALUE):
-        ax_.set_xlim(xMin_, xMax_);
-
-    if (yMin_ > INVALID_VALUE and yMax_ > INVALID_VALUE):
-        ax_.set_ylim(yMin_, yMax_);
-
-    #-- recursively find the correct yTickStep based on the max value. The yTickStep should fit 10 times into maxDataValue_.
+    #-- recursively find the correct yTickStep based on the max value. The yTickStep should fit N times into maxDataValue_.
     #   then annotate the y axis.
     if (yTicksStep_ <= 0):
-        yTicksStep_ = 1;
+        yTicksStep_ = 0.00001;
         stop = False;
-
         while (stop == False):
-            if (maxDataValue_ / yTicksStep_ <= 10):
+            if (maxDataValue_ / yTicksStep_ <= 20):
                 stop = True;
             else:
                 yTicksStep_ *= 10;
 
+    #-- determine the y span of data
+    dataRange = maxDataValue_ - minDataValue_;
+    plotYMin = minDataValue_ - dataRange*0.1;
+    plotYMax = maxDataValue_ + dataRange*0.1;
+
+    #-- round to the closest multiply of N, where N fits yTickStep
+    plotYMin = plotYMin - (plotYMin%yTicksStep_);
+
+    if (xMin_ > INVALID_VALUE and xMax_ > INVALID_VALUE):
+        ax_.set_xlim(xMin_, xMax_);
+
+    if (yMin_ != INVALID_VALUE):
+        plotYMin = yMin_;
+    if (yMax_ != INVALID_VALUE):
+        plotYMax = yMax_;
+
+    ax_.set_ylim(plotYMin, plotYMax);
 
     ticks = [];
     ticksLabels = [];
 
-    start, stop = ax_.get_ylim();
+    start = plotYMin;
+    stop = plotYMax;
 
-    if (yMax_ != INVALID_VALUE):
-        stop = yMax_;
-
-    if (yMin_ != INVALID_VALUE):
-        start = yMin_;
     if (yMin_ == - yMax_*0.05):
         start = 0;
 
@@ -837,10 +851,11 @@ def setFigureAxisLimits(ax_, maxDataValue_, xMin_=INVALID_VALUE, xMax_=INVALID_V
     ticksLabels = [];
     for t in range(len(ticks)):
         intVal = int(ticks[t]);
-        if (intVal >= 1000):
+        if (abs(intVal) >= 1000):
             ticksLabels.append("{}k".format( intVal / 1000));
         else:
             ticksLabels.append(ticks[t]);
+
     ax_.set_yticklabels(ticksLabels);
 
 

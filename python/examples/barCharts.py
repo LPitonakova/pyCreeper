@@ -27,7 +27,7 @@ def example1_simple(saveFiles_):
 def example2_multiple(saveFiles_):
     """
     In this example, a bar chart with multiple bar groups is created and their custom colors are specified:
-
+    !TODO code in crGraphs
     .. image:: ../exampleOutput/linePlot_simple.png
         :scale: 50%
 
@@ -37,7 +37,7 @@ def example2_multiple(saveFiles_):
 def example3_errorBars(saveFiles_):
     """
     In this example, a bar chart with multiple bar groups and error bars is created:
-
+    !TODO code in crGraphs
     .. image:: ../exampleOutput/linePlot_simple.png
         :scale: 50%
 

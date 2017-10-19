@@ -2,7 +2,7 @@
 Code examples
 ===================================================
 
-Line plot
+Line and box plots
 --------------------------------
 
 .. automodule:: examples.linePlots

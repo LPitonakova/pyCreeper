@@ -109,15 +109,70 @@ def getArrayByFlippingColumnsAndRows(array_):
             retArray[j][i] = array_[i][j];
     return retArray;
 
-
-
-def sampleDownTimeSeriesData(data_, timeBinLength_, isTimeFirstDimension_=True, useAverages_ = True, discardZerosFromAverages_ = False, debug_=False):
+def getMedianOfAList(list_, ignoreZeros_ = False):
     """
-    Sample down 2D data that has one dimension as time and another as soemthing else.
-    isTimeFirstDimension_ defines if time is the 0th dimension of the data
-    Return 2D array where 0th dimension is sampled down time (into numOfTimeBins_) and 1st dimension is the 0th dimension of the original data
-    If useAverages_ is False, the returned data will be accumulation of data values for each bin.
+    Get median value of a list of values.
+
+    :param list_: The list
+    :param ignoreZeros_: (optional, default = True) If true, only non-zero values are considered when looking for a median
+
+    :return number
     """
+    if (len(list_) == 0):
+        return 0;
+
+    if (ignoreZeros_):
+        valueList = [];
+        for i in range(len(list_)):
+            if (list_[i] != 0):
+                valueList.append(list_[i])
+
+        if (len(valueList) == 0):
+            return 0;
+        #valueList = [2 for value in valueList if value != 0]
+    else:
+        valueList = list_;
+
+    theValues = sorted(valueList);
+    if len(theValues) % 2 == 1:
+        return theValues[int((len(theValues)+1)/2-1)]
+    else:
+        index = len(theValues)/2-1
+        if (index >= 0 and index < len(theValues)):
+            lower = theValues[int(len(theValues)/2)-1]
+            upper = theValues[int(len(theValues)/2)]
+            return (float(lower + upper)) / 2
+        else:
+            return theValues[0];
+
+def compressTimeSeriesData(data_, timeBinLength_, isTimeFirstDimension_=True, useAverages_ = True, discardZerosFromAverages_ = False, debug_=False):
+    """
+    Compress 2D data that has one dimension as time and another as something else by aggregating data into time bins.
+
+    For example:
+
+    .. code-block:: python
+
+        realTimeData = [
+                [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+                [10, 9, 8, 7, 6, 5, 4, 3, 2, 1]
+        ];
+
+        compressedData = pyCreeper.crData.compressTimeSeriesData(realTimeData,3,isTimeFirstDimension_=False)
+        print(compressedData)
+
+        [out:] [[2.0, 9.0], [5.0, 6.0], [8.0, 3.0], [3.3333333333333335, 0.3333333333333333]]
+
+    :param data_: 2D array
+    :param timeBinLength_: length of one time bin (number of time bins of the uncompressed data)
+    :param isTimeFirstDimension_: (optional, default = True) If true, the 0th dimension of `data_` should represent time
+    :param useAverages_: (optional, default = True) If true, the compressed value in each time bin will be an average of values of the uncompressed data. If false, sum of uncompressed data values is used.
+    :param discardZerosFromAverages_: (optional, default = False) If true, averages calculated when useAverages_=True do not take 0s into account
+    :param debug_: (optional, default = False) If true, extra debug info is printed
+
+    :return: 2D array where 0th dimension is compressed time and 1st dimension is the compressed data values
+    """
+
     if (debug_):
         print("sample down using time bin length " + str(timeBinLength_))
         print("Original data:")
@@ -126,30 +181,34 @@ def sampleDownTimeSeriesData(data_, timeBinLength_, isTimeFirstDimension_=True, 
     otherDimLength = 0;
     if (isTimeFirstDimension_):
         otherDimLength = len(data_[0]);
-        endTime_ = len(data_)
+        endTime = len(data_)
     else:
         otherDimLength = len(data_);
-        endTime_ = (len(data_[0]));
+        endTime = (len(data_[0]));
 
 
-    numOfTimeBins = int(endTime_ / timeBinLength_);
-    if (numOfTimeBins*timeBinLength_ < endTime_):
+
+    numOfTimeBins = int(endTime / timeBinLength_);
+    if (numOfTimeBins*timeBinLength_ < endTime):
         numOfTimeBins += 1;
 
     returnData = [[0 for r in range(otherDimLength)] for i in range(numOfTimeBins)];
     for i in range(otherDimLength):
         accumulatedVal = 0;
-        #print(len(data_[0]))
+
         timeBinNumOfNonZeroValues = 0;
-        for t in range(endTime_):
+        binEndTime = endTime;
+        for t in range(binEndTime):
             timeBin = int(math.floor(t / timeBinLength_));
             startTime = timeBin * timeBinLength_;
-            endTime = startTime + timeBinLength_ - 1;
+            binEndTime = min(endTime-1, startTime + timeBinLength_ - 1);
+
             if (t == startTime):
                 timeBinNumOfNonZeroValues = 0;
                 accumulatedVal = 0;
-                #if (debug_):
-                    #print("Time bin start at t={}".format(t))
+                if (debug_):
+                    print("Time bin start at t={}".format(t))
+
             valueToAdd = 0;
             try:
                 if (isTimeFirstDimension_):
@@ -157,15 +216,16 @@ def sampleDownTimeSeriesData(data_, timeBinLength_, isTimeFirstDimension_=True, 
                 else:
                     valueToAdd = data_[i][t];
             except IndexError:
-                raise IndexError("!!!!!! index {} t {}  no value".format(i,t) )
+                pass
+                #raise IndexError("!!!!!! index {} t {}  no value".format(i,t) )
 
 
             if (valueToAdd != 0):
                 timeBinNumOfNonZeroValues += 1;
 
             accumulatedVal += valueToAdd;
-
-            if (t == endTime):
+            print("t {} endTime {} val {}".format(t, binEndTime, accumulatedVal));
+            if (t == binEndTime):
                 #-- end of time bin, take average and note it into output array
                 if (useAverages_):
                     if (discardZerosFromAverages_):

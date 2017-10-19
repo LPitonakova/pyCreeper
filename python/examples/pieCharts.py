@@ -39,7 +39,7 @@ def example2_colors(saveFiles_):
 
 def example3_multiFigure(saveFiles_):
     """
-    In this example, 2 figures are created below each other and saved into a single file:
+    In this example, two figures are created below each other and saved into a single file:
 
     .. image:: ../exampleOutput/pieChart_large.png
         :scale: 100%

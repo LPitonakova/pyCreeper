@@ -115,10 +115,18 @@ def example4_boxPlots(saveFiles_):
 
 if __name__ == "__main__":
 
-    saveFiles = False;
+    saveFiles = True;
 
-    example1_simple(saveFiles);
-    example2_multiple(saveFiles);
-    example3_errorBars(saveFiles);
-    example4_boxPlots(saveFiles);
+    #example1_simple(saveFiles);
+    #example2_multiple(saveFiles);
+    #example3_errorBars(saveFiles);
+    #example4_boxPlots(saveFiles);
+
+    realTimeData = [
+                [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+                [10, 9, 8, 7, 6, 5, 4, 3, 2, 1]
+        ];
+    import pyCreeper.crData;
+    compressedData = pyCreeper.crData.compressTimeSeriesData(realTimeData,3,isTimeFirstDimension_=False)
+    print(compressedData)
 
