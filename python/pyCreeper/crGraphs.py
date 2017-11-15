@@ -152,8 +152,10 @@ def createBarChart(data_,
                 plots.append(plot);
 
         else:
-            maxVal = crData.getMaxValueInAList(data_);
-            minVal = crData.getMinValueInAList(data_);
+            if (maxVal < crData.getMaxValueInAList(data_[i])):
+                maxVal = crData.getMaxValueInAList(data_[i]);
+            if (minVal > crData.getMinValueInAList(data_[i])):
+                minVal = crData.getMinValueInAList(data_[i]);
             plot = ax.bar(xLocations+i*barWidth_, data_[i], barWidth_, color=colorCode); #yerr=stdData_[i]
             plots.append(plot);
 
@@ -404,9 +406,10 @@ def createLinePlot(data_,
 
         else:
             #-- each element for a single data point is a single number. Plot directly from these numbers.
-
-            maxVal = crData.getMaxValueInAList(data_);
-            minVal = crData.getMinValueInAList(data_);
+            if (maxVal < crData.getMaxValueInAList(data_[i])):
+                maxVal = crData.getMaxValueInAList(data_[i]);
+            if (minVal > crData.getMinValueInAList(data_[i])):
+                minVal = crData.getMinValueInAList(data_[i]);
 
             #-- draw, in line segments
             for seg in range(numOfSegments):
