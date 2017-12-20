@@ -85,7 +85,9 @@ def createBarChart(data_,
                     showConfidenceIntervals_=False, barWidth_ = 0.35,
                     xMin_=INVALID_VALUE, xMax_=INVALID_VALUE, xAxisGroupSize_ = 0, yMin_=INVALID_VALUE, yMax_=INVALID_VALUE, yTicksStep_ = 0, yTicksStepMultiplier_ = 1,
                     titleFontSize_=INVALID_VALUE, labelFontSize_ = INVALID_VALUE, tickFontSize_ = INVALID_VALUE, legendFontSize_ = INVALID_VALUE, size_=(12,6),
-                    filePath_ = "", renderFigure_=True, figure_=None, subPlot_=111):
+                    xOffset_ = 0, yOffset_ = 0,
+                    filePath_ = "", renderFigure_=True, figure_=None, subPlot_=111,
+                    ):
     """
     Create bars for groups next to each other, grouped by group labels. [Work in progress]
     """
@@ -113,7 +115,7 @@ def createBarChart(data_,
 
     xLocations = numpy.arange(len(data_[0]))  # the x locations for the groups
 
-    fig, ax = createFigure(size_, title_, figure_, subPlot_, xLabel_, yLabel_, titleFontSize_, labelFontSize_, tickFontSize_, 1.2, 1.05);
+    fig, ax = createFigure(size_, title_, figure_, subPlot_, xLabel_, yLabel_, titleFontSize_, labelFontSize_, tickFontSize_, 1.2, 1.05, xOffset_=xOffset_, yOffset_=yOffset_);
 
     plt.xticks(xLocations+barWidth_, size=labelFontSize_);
     ax.set_xticklabels( xTickLabels_, size=tickFontSize_);
@@ -200,6 +202,7 @@ def createLinePlot(data_,
                 lineWidth_ = 2, lineStyles_ = [], markerSize_=10, gridType_=GRID_TYPE.FULL,
                 xMin_=INVALID_VALUE, xMax_=INVALID_VALUE, xAxisGroupSize_ = 0, yMin_=INVALID_VALUE, yMax_=INVALID_VALUE, yTicksStep_ = 0, yTicksStepMultiplier_ = 1,
                 titleFontSize_=INVALID_VALUE, labelFontSize_ = INVALID_VALUE, tickFontSize_ = INVALID_VALUE, legendFontSize_ = INVALID_VALUE, size_=(12,6),
+                xOffset_ = 0, yOffset_ = 0, useBoxPlotPadding_ = False,
                 filePath_ = "", renderFigure_=True, figure_=None, subPlot_=111):
 
     """
@@ -247,6 +250,9 @@ def createLinePlot(data_,
     :param `tickFontSize_`: (optional, default = TICK_FONT_SIZE) Font size of axis ticks and of values inside the plot
     :param `legendFontSize_`: (optional, default = LABEL_FONT_SIZE) Font size of the legend
     :param `size_`: (optional, default = (8,6)) The figure size
+    :param `xOffset_`: (optional, default = 0) Horizontal offset of the plot
+    :param `yOffset_`: (optional, default = 0) Vertical offset of the plot
+    :param `useBoxPlotPadding_`: (optional, default = False) Set this to true to add horizontal padding to the plot that matches padding of a box plot. E.g. when showing single data points next to similar box plot graphs, it might be desirable to keep the plot paddings the same.
     :param `filePath_`: (optional, default = "") If not empty, the figure will be saved to the file path specified. If empty, the figure will be displayed on screen instead.
     :param `renderFigure_`: (optional, default = True) If false, the figure will not be displayed or printed. Set to False when putting multiple figures together via the `figure_` parameter.
     :param `figure_`: (optional, default = None) If not None, the figure will be created into this figure (pylab.figure)
@@ -300,7 +306,7 @@ def createLinePlot(data_,
 
 
     #-- create the figure
-    fig, ax = createFigure(size_, title_, figure_, subPlot_, xLabel_, yLabel_, titleFontSize_, labelFontSize_, tickFontSize_, 1.2, 1.05);
+    fig, ax = createFigure(size_, title_, figure_, subPlot_, xLabel_, yLabel_, titleFontSize_, labelFontSize_, tickFontSize_, 1.2, 1.05, xOffset_, yOffset_);
 
     #-- prepare x tick data, which has to be scalars
     xTickData = [];
@@ -313,7 +319,7 @@ def createLinePlot(data_,
 
 
     #-- prepare box plot width
-    if ((showBoxPlots_ and boxPlotWidth_ <= 0) or showConfidenceIntervals_):
+    if ((showBoxPlots_ and boxPlotWidth_ <= 0) or showConfidenceIntervals_ or useBoxPlotPadding_):
         boxPlotWidth_ = abs(xTickData[-1] - xTickData[0]) / 20.0;
 
 
@@ -467,7 +473,7 @@ def createLinePlot(data_,
         ax.grid(which=gridWhich, axis=gridAxis, linestyle=":");
 
     #-- adjust x axis and y axis limits:
-    if (showBoxPlots_ or showConfidenceIntervals_):
+    if (useBoxPlotPadding_ or showBoxPlots_ or showConfidenceIntervals_):
         #-- make space for box plots
         ax.set_xlim(xTickData[0]-2*boxPlotWidth_/3.0,xTickData[-1]+2*boxPlotWidth_/3.0);
     else:
@@ -487,13 +493,7 @@ def createLinePlot(data_,
             legendItems.append(plots[g][0]);
         legend = ax.legend(flip(legendItems, numOfLegendColumns_), flip(legendLabels_,numOfLegendColumns_),loc=legendPosition_.value, ncol=numOfLegendColumns_)
         for t in legend.get_texts():
-            if (type(legendFontSize_) == str):
-                t.set_fontsize(legendFontSize_)
-            else:
-                font = math.QFont(t.font());
-                font.setPointSize(legendFontSize_);
-                t.setFont(font);
-
+            t.set_fontsize(legendFontSize_);
 
     #-- display / print, return:
     renderFigure(filePath_, renderFigure_);
@@ -507,6 +507,7 @@ def createMatrixPlot(data_=[[],[]],
                     colorMap_ = None, minValue_ = INVALID_VALUE, maxValue_ = INVALID_VALUE,
                     annotateValues_=False, annotationStringAfter_="", annotationValues_=[[],[]], roundAnnotatedValues_=False,
                     titleFontSize_=INVALID_VALUE, labelFontSize_ = INVALID_VALUE, tickFontSize_ = INVALID_VALUE, size_=(8,6),
+                    xOffset_ = 0, yOffset_ = 0,
                     filePath_ = "", renderFigure_=True, figure_=None, subPlot_=111):
 
     """
@@ -541,6 +542,8 @@ def createMatrixPlot(data_=[[],[]],
     :param `labelFontSize_`: (optional, default = LABEL_FONT_SIZE) Font size of the axis and color bar labels
     :param `tickFontSize_`: (optional, default = TICK_FONT_SIZE) Font size of axis ticks and of values inside the plot
     :param `size_`: (optional, default = (8,6)) The figure size
+    :param `xOffset_`: (optional, default = 0) Horizontal offset of the plot
+    :param `yOffset_`: (optional, default = 0) Vertical offset of the plot
     :param `filePath_`: (optional, default = "") If not empty, the figure will be saved to the file path specified. If empty, the figure will be displayed on screen instead.
     :param `renderFigure_`: (optional, default = True) If false, the figure will not be displayed or printed. Set to False when putting multiple figures together via the `figure_` parameter.
     :param `figure_`: (optional, default = None) If not None, the figure will be created into this figure (pylab.figure)
@@ -582,7 +585,7 @@ def createMatrixPlot(data_=[[],[]],
         cmap=colorMap_;
 
     #-- create the figure
-    fig, ax = createFigure(size_, title_, figure_, subPlot_, xLabel_, yLabel_, titleFontSize_, labelFontSize_, tickFontSize_);
+    fig, ax = createFigure(size_, title_, figure_, subPlot_, xLabel_, yLabel_, titleFontSize_, labelFontSize_, tickFontSize_,xOffset_=xOffset_, yOffset_=yOffset_);
     cax = ax.matshow(data_,cmap=cmap,origin=origin,vmin=minValue_,vmax=maxValue_);
 
     #-- set tick labels
@@ -624,6 +627,7 @@ def createPieChart(data_=[], itemLabels_=[],
                     title_="", itemColors_=[],
                     showActualVals_=True, showPercentageVals_=False, showShadow_=False,
                     titleFontSize_=INVALID_VALUE, itemsFontSize_= INVALID_VALUE, valuesFontSize_=INVALID_VALUE, size_=(6,6),
+                    xOffset_ = 0, yOffset_ = 0,
                     filePath_ = "", renderFigure_=True, figure_=None, subPlot_=111):
     """
     Create a pie chart.
@@ -648,6 +652,8 @@ def createPieChart(data_=[], itemLabels_=[],
     :param `groupsFontSize_`: (optional, default = LABEL_FONT_SIZE) Font size of the item names
     :param `valuesFontSize_`: (optional, default = TICK_FONT_SIZE) Font size of values in the pie
     :param `size_`: (optional, default = (6,6)) The figure size
+    :param `xOffset_`: (optional, default = 0) Horizontal offset of the plot
+    :param `yOffset_`: (optional, default = 0) Vertical offset of the plot
     :param `filePath_`: (optional, default = "") If not empty, the figure will be saved to the file path specified. If empty, the figure will be displayed on screen instead.
     :param `renderFigure_`: (optional, default = True) If false, the figure will not be displayed or printed. Set to False when putting multiple figures together via the `figure_` parameter.
     :param `figure_`: (optional, default = None) If not None, the figure will be created into this figure (pylab.figure)
@@ -686,7 +692,7 @@ def createPieChart(data_=[], itemLabels_=[],
         return '';
 
     #-- create the graph
-    fig, ax = createFigure(size_, title_, figure_, subPlot_, titleFontSize_=titleFontSize_);
+    fig, ax = createFigure(size_, title_, figure_, subPlot_, titleFontSize_=titleFontSize_, xOffset_=xOffset_, yOffset_=yOffset_);
     patches, texts, autotexts = ax.pie(data_, labels=itemLabels_, autopct=formatPieceNumber, shadow=showShadow_, colors=itemColors_);
 
     #-- setup fonts
@@ -732,7 +738,8 @@ def renderFigure(filePath_="", renderFigure_=True):
 def createFigure(size_, title_="", figure_=None, subPlot_=111,
                 xLabel_="", yLabel_="",
                 titleFontSize_=INVALID_VALUE, labelFontSize_=INVALID_VALUE, tickFontSize_=INVALID_VALUE,
-                xStretchMultiply_=1.2, yStretchMultiply_=1.2):
+                xStretchMultiply_=1.2, yStretchMultiply_=1.2,
+                xOffset_=0, yOffset_=0):
     """
     A helper function that creates a figure.
 
@@ -747,6 +754,8 @@ def createFigure(size_, title_="", figure_=None, subPlot_=111,
     :param `tickFontSize_`: (optional, default = TICK_FONT_SIZE) Font size of axis ticks and of values inside the plot
     :param `xStretchMultiply_`: (optional, default = 1.2) By how much to stretch the plot inside the figure in x direction. Enter 1.0 to leave the plot as is.
     :param `yStretchMultiply_`: (optional, default = 1.2) By how much to stretch the plot inside the figure in y direction. Enter 1.0 to leave the plot as is.
+    :param `xOffset_`: (optional, default = 0) Horizontal offset of the plot
+    :param `yOffset_`: (optional, default = 0) Vertical offset of the plot
 
     :return: (pylab.figure, pylab.ax)
     """
@@ -766,9 +775,15 @@ def createFigure(size_, title_="", figure_=None, subPlot_=111,
     #-- specify title, stretch the plot
     xStretchMultiply_ = xStretchMultiply_-1;
     yStretchMultiply_ = yStretchMultiply_-1;
+    yOffset = yOffset_;
     if (title_ != ""):
         fig.suptitle(title_, fontsize=titleFontSize_);
         yStretchMultiply_ -= 0.1;
+        yOffset += -0.03;
+    else:
+        yOffset += -0.05;
+        yStretchMultiply_ = 0.1;
+        #print("here")
 
     if (xLabel_ != ""):
         yStretchMultiply_ -= 0.1;
@@ -776,7 +791,7 @@ def createFigure(size_, title_="", figure_=None, subPlot_=111,
         xStretchMultiply_ -= 0.1;
 
     box = ax.get_position();
-    ax.set_position([box.x0 - box.width * (xStretchMultiply_/2), box.y0 - box.height*yStretchMultiply_/2, box.width*(1+xStretchMultiply_), box.height*(1+yStretchMultiply_)]);
+    ax.set_position([box.x0 - box.width * (xStretchMultiply_/2) + xOffset_, box.y0 - box.height*yStretchMultiply_/2 - yOffset, box.width*(1+xStretchMultiply_), box.height*(1+yStretchMultiply_)]);
 
 
     pylab.xlabel(xLabel_, size=labelFontSize_);
