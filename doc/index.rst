@@ -35,6 +35,7 @@ Contents
 
     supportedGraphs
     examples
+    advanced_usingStyles
     advanced_brokenLinePlots
     api
     versionHistory

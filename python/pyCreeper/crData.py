@@ -193,7 +193,7 @@ def getListByFlippingColumnsAndRows(array_):
 def getListColumnAsArray(array_, columnId_, valueMultiplier_=1):
     """
     Returns a 1d list filled with values of a column of a specified array.
-    Also multiplies each value by valueMultiplier_.
+    Also multiplies each value by `valueMultiplier_`.
 
     :param array_: 2D array of data
     :param columnId_: id of the column to retrieve (0-based)

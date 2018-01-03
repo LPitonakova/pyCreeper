@@ -34,6 +34,14 @@ crGraphs
     :undoc-members:
 
 --------------------
+crGraphStyle
+--------------------
+
+.. automodule:: pyCreeper.crGraphStyle
+    :members:
+    :undoc-members:
+
+--------------------
 crData
 --------------------
 

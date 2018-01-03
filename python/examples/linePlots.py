@@ -1,5 +1,6 @@
 from numpy import random;
 from python.pyCreeper import crGraphs;
+from python.pyCreeper import crGraphStyle;
 crGraphs.BASE_FILE_PATH = "../../exampleOutput/";
 
 def example1_simple(saveFiles_):
@@ -43,11 +44,16 @@ def example2_multiple(saveFiles_):
     legendLabels = ['Customer sales', 'Stocks', 'Total profit'];
     months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep"];
 
+    style = crGraphStyle.crGraphStyle();
+    style.markers = ['o','o','s'];
+    style.colors = ['g','c','r'];
+    crGraphs.setStyle(style);
+
     filePath = "";
     if (saveFiles_):
         filePath = "linePlot_multi.png";
     crGraphs.createLinePlot(profitData, "Profit so far this year", xTickLabels_=months, xLabel_="Month", yLabel_="Profit (mil. £)", yMin_=0, yMax_=100,
-                            markers_ = ['o','o','s'], colors_=['g','c','r'], legendLabels_=legendLabels, filePath_=filePath);
+                            legendLabels_=legendLabels, filePath_=filePath);
 
 
 def example3_errorBars(saveFiles_):
@@ -55,7 +61,7 @@ def example3_errorBars(saveFiles_):
     In this example, a multi-line plot with error bars is created, with horizontal-only grid shown and with
     data points connected together based on which year quarter they belong to:
 
-    .. image:: ../exampleOutput/linePlot_errorBars2.png
+    .. image:: ../exampleOutput/linePlot_errorBars.png
         :scale: 50%
 
     :param saveFiles_: Boolean if True, figures are saved, if False, figures are displayed
@@ -75,10 +81,17 @@ def example3_errorBars(saveFiles_):
     filePath = "";
     if (saveFiles_):
         filePath = "linePlot_errorBars.png";
+
+    style = crGraphStyle.crGraphStyle();
+    style.markers = ['o','o','s'];
+    style.colors = ['g','c','r'];
+    style.numOfLegendColumns = 3;
+    style.legendPosition = crGraphStyle.LEGEND_POSITION.UPPER_LEFT;
+    style.gridType = crGraphStyle.GRID_TYPE.HORIZONTAL;
+    crGraphs.setStyle(style);
+
     crGraphs.createLinePlot(profitData, "Profit so far this year", xTickLabels_=months, xLabel_="Month", yLabel_="Profit (mil. £)", yMin_=-20, yMax_=120,
-                            markers_ = ['o','o','s'], colors_=['g','c','r'], legendLabels_=legendLabels, showConfidenceIntervals_=True, xAxisGroupSize_=3,
-                            numOfLegendColumns_=3, legendPosition_=crGraphs.LEGEND_POSITION.UPPER_LEFT, gridType_=crGraphs.GRID_TYPE.HORIZONTAL,
-                            filePath_=filePath);
+                            legendLabels_=legendLabels, showConfidenceIntervals_=True, xAxisGroupSize_=3,filePath_=filePath);
 
 def example4_boxPlots(saveFiles_):
     """
@@ -89,28 +102,34 @@ def example4_boxPlots(saveFiles_):
     A \* notation is used next to a month where there is significant difference with p=0.05.
     A \*\* notation is used when there is a significant different with p=0.01.
 
-    .. image:: ../exampleOutput/linePlot_boxPlots2.png
+    .. image:: ../exampleOutput/linePlot_boxPlots.png
         :scale: 50%
 
     :param saveFiles_: Boolean if True, figures are saved, if False, figures are displayed
     """
 
     profitData = [
-                [9,  20, 30, 20, 35, 55, 40, 20, 30],
-                [1,  20, 28.5, 12, 25, 53.5, 35, 35, 40]
+                [20,  20, 30, 20, 35, 55, 40, 20, 30],
+                [10,  20, 28.5, 12, 25, 53.5, 35, 35, 40]
     ];
     #-- change each data point above to become a list with a normal distribution instead, with median of profitData[i][j]
-    profitData = [ [ list(random.standard_normal(20)*2 + profitData[i][j]) for j in range(len(profitData[i])) ] for i in range(len(profitData))];
+    profitData = [ [ list(random.standard_normal(30)*3 + profitData[i][j]) for j in range(len(profitData[i])) ] for i in range(len(profitData))];
 
     legendLabels = ['Customer sales', 'Stocks'];
     months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep"];
+
+    style = crGraphStyle.crGraphStyle();
+    style.markers = ['s','s'];
+    style.colors = ['g','r'];
+    style.lineWidth = 0;
+    style.gridType = crGraphStyle.GRID_TYPE.NONE;
+    crGraphs.setStyle(style);
 
     filePath = "";
     if (saveFiles_):
         filePath = "linePlot_boxPlots.png";
     crGraphs.createLinePlot(profitData, "Profit so far this year", xTickLabels_=months, xLabel_="Month", yLabel_="Profit (mil. £)", yMin_=0, yMax_=80,
-                            markers_ = ['s','s'], colors_=['g','r'], legendLabels_=legendLabels, showBoxPlots_=True, lineWidth_=0, gridType_=crGraphs.GRID_TYPE.NONE, doWilcoxon_=True,
-                            filePath_=filePath);
+                            legendLabels_=legendLabels, showBoxPlots_=True, doWilcoxon_=True, filePath_=filePath);
 
 
 if __name__ == "__main__":

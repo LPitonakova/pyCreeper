@@ -5,7 +5,7 @@ Supported figure types
 ----------------------------
 Box plots
 ----------------------------
-.. figure:: ../exampleOutput/linePlot_boxPlots2.png
+.. figure:: ../exampleOutput/linePlot_boxPlots.png
     :scale: 100%
 
     Function :func:`pyCreeper.crGraphs.createLinePlot`
@@ -16,7 +16,7 @@ Box plots
 ----------------------------
 Line plots
 ----------------------------
-.. figure:: ../exampleOutput/linePlot_errorBars2.png
+.. figure:: ../exampleOutput/linePlot_errorBars.png
     :scale: 100%
 
     Function :func:`pyCreeper.crGraphs.createLinePlot`
