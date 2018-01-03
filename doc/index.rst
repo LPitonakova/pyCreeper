@@ -12,7 +12,19 @@ pyCreeper 1.1
 
 The main purpose of pyCreeper is to wrap tens of lines of python code, required to produce graphs that look good for a publication, into functions. It takes away your need to understand various quirks of matplotlib and gives you back ready-to-use and well-documented code.
 
-**Download pyCreeper from GitHub:** `https://github.com/Elendurwen/pyCreeper <https://github.com/Elendurwen/pyCreeper>`_
+.. image:: images/download.png
+    :width: 220 px
+    :align: left
+    :target: https://github.com/LPitonakova/pyCreeper/archive/master.zip
+
+**You can also download or clone pyCreeper from GitHub:** `https://github.com/Elendurwen/pyCreeper <https://github.com/Elendurwen/pyCreeper>`_
+
+|
+|
+
+**Installing pyCreeper** is very easy and mostly simply means extracting the zip file and putting the contents into a location of your choice. Have a look at the `Readme file on GitHub <https://github.com/Elendurwen/pyCreeper>`_ to find out what dependencies you need and how to include pyCreeper in your project.
+
+**Using pyCreeper?** `Let me know <mailto:contact@lenkaspace.net>`_ **and I will feature your project here!**
 
 Newest additions
 --------------------
@@ -33,6 +45,7 @@ Contents
 .. toctree::
     :maxdepth: 2
 
+    download
     supportedGraphs
     examples
     advanced_usingStyles
