@@ -50,6 +50,14 @@ crData
     :undoc-members:
 
 --------------------
+crFiles
+--------------------
+
+.. automodule:: pyCreeper.crFiles
+    :members:
+    :undoc-members:
+
+--------------------
 crHelpers
 --------------------
 

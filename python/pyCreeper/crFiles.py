@@ -2,12 +2,32 @@
 DEBUG_LEVEL = 0;
 
 #
-def fileToArray(filePath_, separator_=",", ignoreFirstRow_=False,endRow_=-1,maxTime_=-1, timeColumn_=0, startRow_=1):
+def fileToArray(filePath_, separator_=",", ignoreFirstRow_=False, startRow_=1, endRow_=-1):
     """
-    Take a file that has rows and columns of values and convert it into a 2d array
-    in format array[rows][columns]
-    Set the containsNumbers_ to False if e.g. there are strings int the file
+    Store data from a file in a 2D array with format array[rows][columns]. For example, if a file looks like this:
+
+    .. code-block:: python
+
+        time,column1,column2
+        1,20,30
+        2,25,60
+
+    The resulting data array will be
+
+    .. code-block:: python
+
+        [[1,20,30],
+         [2,25,60]]
+
+    :param filePath_: Full path to the file
+    :param separator_: (optional, default = ",") String that separates values in a row
+    :param ignoreFirstRow_: (optional, default = False) If True, the first row of the file will not be parsed. Useful when the first row contains column descriptions
+    :param startRow_: (optional, default = 1) The first row that will be read
+    :param endRow_: (optional, default = -1) When >=0, only rows up to `endRow_` will be read
+
+    :return: A 2D array
     """
+
     data = []
     fileOk = False;
     if (DEBUG_LEVEL == 1):
@@ -61,16 +81,7 @@ def fileToArray(filePath_, separator_=",", ignoreFirstRow_=False,endRow_=-1,maxT
             #print(dataInts);
             #-- add to main data structure
             if (len(dataInts) > 0):
-
-                #-- process to a certain time of simulation, if time is given in column timeColumn_
-                if (maxTime_ >= 0 and dataInts[timeColumn_] > maxTime_ ):
-                    continue
-
                 data.append(dataInts)
                 #print(data);
-
-
-
-
 
     return data

@@ -3,7 +3,20 @@ Version history
 ===================================================
 
 ----------------------------
-1.1 (NEW!)
+2.0 (NEW!)
+----------------------------
+
+* **Properly encapsulated plot styles!** :ref:`Advanced: Using styles`
+* **Reading text files into 2D arrays** with a new module :mod:`pyCreeper.crFiles`
+* New functions in :mod:`pyCreeper.crData`:
+    * Add and remove unique list elements with :func:`pyCreeper.crData.addUniqueElementToList` and :func:`pyCreeper.crData.removeElementFromList`
+    * Extract data from a specific list column: :func:`pyCreeper.crData.getListColumnAsArray`
+    * Get the average value in a list: :func:`pyCreeper.crData.getAverageOfAList`
+
+* Minor bug fixes
+
+----------------------------
+1.1
 ----------------------------
 
 * :ref:`Advanced: Broken line plots`

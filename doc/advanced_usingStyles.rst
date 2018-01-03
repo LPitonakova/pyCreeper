@@ -9,7 +9,7 @@ Styles a way of specifying how plots created by :mod:`pyCreeper.crGraphs` should
 1. **crGraphStyle disallows setting of properties that are invalid.** This means that python will let you know when you try to set a style that does not exist.
 2. When you set crGraphStyle properties, **a type check is performed** in the background. Python will let you know if you are trying to set a property value that does not make sense
 3. **Enumerations instead of strings are used where appropriate**, for example, to set a grid style. This meas that you can easily select from a set of valid values.
-4. You can **easily revert to the default look** by calling the reset function
+4. You can **easily revert to the default look** by calling the style reset function
 
 When no styles are specified, :mod:`pyCreeper.crGraphs` uses a default style. For example, a default line plot may look like this:
 
