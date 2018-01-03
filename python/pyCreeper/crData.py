@@ -12,6 +12,9 @@ import copy;
 
 SHOW_OUTPUT = False;
 
+
+#======================== LIST PROPERTIES ================
+
 def getNumberOfListDimensions(list_):
     """
     Return the number of dimensions of an N-dimensional list by recursively going through the list
@@ -89,32 +92,13 @@ def getMaxValueInAList(list_):
         raise NotImplementedError("crData.getMaxValueInAList() has not been implemented for more than 2-dimensional lists.")
 
 
-def getListByFlippingColumnsAndRows(array_):
-    """
-    Return array that has rows with columns flipped
-
-    :param array_: 2D array of data
-
-    :return: 2D array of data
-    """
-    numOfDimensions=getNumberOfListDimensions(array_);
-    if (numOfDimensions != 2):
-        raise ValueError("The parameter array_ must be a 2D array. The array provided has {} dimension(s).".format(numOfDimensions))
-
-    numOfRows = len(array_);
-    numOfCols = len(array_[0]);
-    retArray = [[0.0 for i in range(numOfRows)] for j in range(numOfCols)];
-    for i in range(numOfRows):
-        for j in range(numOfCols):
-            retArray[j][i] = array_[i][j];
-    return retArray;
 
 def getMedianOfAList(list_, ignoreZeros_ = False):
     """
     Get median value of a list of values.
 
     :param list_: The list
-    :param ignoreZeros_: (optional, default = True) If true, only non-zero values are considered when looking for a median
+    :param ignoreZeros_: (optional, default = False) If true, only non-zero values are considered when looking for a median
 
     :return number
     """
@@ -144,6 +128,85 @@ def getMedianOfAList(list_, ignoreZeros_ = False):
             return (float(lower + upper)) / 2
         else:
             return theValues[0];
+
+
+#
+def getAverageOfAList(list_, ignoreZeros_=False, nullValue_ = 0):
+    """
+    Get average value of a list of values.
+
+    :param list_: The list
+    :param ignoreZeros_: (optional, default = False) If true, only non-zero values are considered when calculating the average
+    :param nullValue_: (optional, default = 0) Value that should be returned when the `list_` is empty
+
+    :return number
+
+    """
+
+    valueList = list_;
+    if (ignoreZeros_):
+        valueList = [];
+        for i in range(len(list_)):
+            if (list_[i] != 0):
+                valueList.append(list_[i])
+
+    if (len(valueList) > 0):
+        return sum(valueList) / len(valueList);
+
+    return nullValue_;
+
+#======================== LIST ELEMENTS MANIPULATION ================
+
+
+def addUniqueElementToList(element_, array_, debugMessage_ = "", printDebug_ = False):
+    if (not (element_ in array_)):
+        array_.append(element_);
+        if (printDebug_ and debugMessage_ != ""):
+            print(debugMessage_);
+
+def removeElementFromList(element_, array_, debugMessage_ = "", printDebug_ = False):
+    if (element_ in array_):
+        array_.remove(element_);
+        if (printDebug_ and debugMessage_ != ""):
+            print(debugMessage_);
+
+def getListByFlippingColumnsAndRows(array_):
+    """
+    Return array that has rows with columns flipped
+
+    :param array_: 2D array of data
+
+    :return: 2D array of data
+    """
+    numOfDimensions=getNumberOfListDimensions(array_);
+    if (numOfDimensions != 2):
+        raise ValueError("The parameter array_ must be a 2D array. The array provided has {} dimension(s).".format(numOfDimensions))
+
+    numOfRows = len(array_);
+    numOfCols = len(array_[0]);
+    retArray = [[0.0 for i in range(numOfRows)] for j in range(numOfCols)];
+    for i in range(numOfRows):
+        for j in range(numOfCols):
+            retArray[j][i] = array_[i][j];
+    return retArray;
+
+def getListColumnAsArray(array_, columnId_, valueMultiplier_=1):
+    """
+    Returns a 1d list filled with values of a column of a specified array.
+    Also multiplies each value by `valueMultiplier_`.
+
+    :param array_: 2D array of data
+    :param columnId_: id of the column to retrieve (0-based)
+    :param valueMultiplier_: (optional, default=1) A value by which to multiply each element in the selected column
+
+    :return 1D array with selected data
+    """
+    retArray = [];
+    numOfRows = len(array_);
+    for i in range(numOfRows):
+        retArray.append(array_[i][columnId_]*valueMultiplier_);
+    return retArray;
+
 
 def compressList(data_, timeBinLength_, useAverages_ = True, discardZerosFromAverages_ = False, debug_=False):
     """

@@ -1,4 +1,8 @@
 from python.pyCreeper import crGraphs;
+from python.pyCreeper import crGraphStyle;
+
+from matplotlib import pyplot;
+
 crGraphs.BASE_FILE_PATH = "../../exampleOutput/";
 
 def example1_simple(saveFiles_):
@@ -24,9 +28,9 @@ def example1_simple(saveFiles_):
 
 
 
-def example2_customAnnotations(saveFiles_):
+def example2_customAnnotationsAndColorMap(saveFiles_):
     """
-    In this example, a matrix plot with custom annotations is created:
+    In this example, a matrix plot with custom annotations and color map is created:
 
     .. image:: ../exampleOutput/matrixPlot_fullAnnotations.png
         :scale: 50%
@@ -44,6 +48,11 @@ def example2_customAnnotations(saveFiles_):
                     ['good', 'good','excellent','excellent']
     ];
 
+    style = crGraphStyle.crGraphStyle();
+    style.figureSize = (16,8);
+    style.colorMap = pyplot.cm.get_cmap("Oranges");
+    crGraphs.setStyle(style);
+
     filePath = "";
     if (saveFiles_):
         filePath = "matrixPlot_fullAnnotations.png";
@@ -52,12 +61,12 @@ def example2_customAnnotations(saveFiles_):
                             xLabel_="Driver skill", xTickLabels_=["Terrible","Quite bad","Satisfactory","Good"],
                             yLabel_="Engine efficiency", yTickLabels_=["Inefficient","OK","Efficient"],
                             annotateValues_=True, annotationValues_=annotations, annotationStringAfter_= "\ncost\nefficiency",
-                            filePath_=filePath, size_=(12,7))
+                            filePath_=filePath)
 
 if __name__ == "__main__":
 
     saveFiles = True;
 
     example1_simple(saveFiles);
-    example2_customAnnotations(saveFiles);
+    example2_customAnnotationsAndColorMap(saveFiles);
 

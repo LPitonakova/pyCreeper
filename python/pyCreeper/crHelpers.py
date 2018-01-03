@@ -20,6 +20,9 @@ def checkVariableIsList(variable_, dimensions_ = 1, nonEmpty_=False):
     :param `nonEmpty_`: (optional, default=False) If true, the list must be non-empty
     """
 
+    checkVariableDataType(variable_,list);
+
+    #-- check dimensions
     throwException = False;
     numOfDimensions = crData.getNumberOfListDimensions(variable_);
     if (numOfDimensions != dimensions_):

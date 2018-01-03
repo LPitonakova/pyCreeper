@@ -1,4 +1,6 @@
 from python.pyCreeper import crGraphs;
+from python.pyCreeper import crGraphStyle;
+
 crGraphs.BASE_FILE_PATH = "../../exampleOutput/";
 
 
@@ -30,12 +32,15 @@ def example2_colors(saveFiles_):
     """
     expenseCategories = ["Rent", "Food", "Travel", "Fun"];
     expenses = [1000, 300, 500, 250];
-    colors = ['yellow','cyan','grey','white']
+
+    style = crGraphStyle.crGraphStyle();
+    style.colors = ['yellow','cyan','grey','white'];
+    crGraphs.setStyle(style);
 
     filePath = "";
     if (saveFiles_):
         filePath = "pieChart_colors.png";
-    crGraphs.createPieChart(expenses, expenseCategories, "Colors example", colors, showPercentageVals_=True, showShadow_=True, filePath_=filePath);
+    crGraphs.createPieChart(expenses, expenseCategories, "Colors example", showPercentageVals_=True, showShadow_=True, filePath_=filePath);
 
 def example3_multiFigure(saveFiles_):
     """
@@ -51,7 +56,11 @@ def example3_multiFigure(saveFiles_):
     expenseCategories = ["Rent", "Food", "Travel", "Fun"];
     expenses = [1000, 300, 500, 250];
 
-    figure1 = crGraphs.createPieChart(expenses, expenseCategories, "Expenses", subPlot_=121, size_=(14,6), renderFigure_=False);
+    style = crGraphStyle.crGraphStyle();
+    style.figureSize = (14,6);
+    crGraphs.setStyle(style);
+
+    figure1 = crGraphs.createPieChart(expenses, expenseCategories, "Expenses", subPlot_=121, renderFigure_=False);
 
     #-- create 2nd figure into the figure1 saved previously. Specify the file path to save into.
     countries = ["Germany", "USA", "Canada"];

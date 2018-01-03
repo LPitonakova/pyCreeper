@@ -1,5 +1,6 @@
 from numpy import random;
 from python.pyCreeper import crGraphs;
+from python.pyCreeper import crGraphStyle;
 
 crGraphs.BASE_FILE_PATH = "../../exampleOutput/";
 
@@ -34,18 +35,22 @@ def example(saveFiles_):
 
     yMinBottomPlot, yMaxBottomPlot, yMinTopPlot, yMaxTopPlot = crGraphs.getBrokenLinePlotParameters(yMinStandardPlot, brokenLineYCoordinate, yMaxStandardPlot, brokenLineHeightPercentage);
 
+    style = crGraphStyle.crGraphStyle();
+    style.lineWidth = 2;
+    crGraphs.setStyle(style);
+
     #-- create the two plots as two separate files, using the y-axis parameters from above
     xTickLabels = [(g+1) for g in range(len(data[0]))];
 
     crGraphs.createLinePlot(data, "Population fitness", xTickLabels_=xTickLabels, xLabel_="Generation", yLabel_="Fitness", yMin_=yMinBottomPlot, yMax_=yMaxBottomPlot,
-                            yTicksStep_=20, showBoxPlots_=True, lineWidth_=2, filePath_=filePathBottomPlot);
+                            yTicksStep_=20, showBoxPlots_=True, filePath_=filePathBottomPlot);
     crGraphs.createLinePlot(data, "Population fitness", xTickLabels_=xTickLabels, xLabel_="Generation", yLabel_="Fitness", yMin_=yMinTopPlot, yMax_=yMaxTopPlot,
-                            showBoxPlots_=True, lineWidth_=2, filePath_=filePathTopPlot);
+                            showBoxPlots_=True, filePath_=filePathTopPlot);
 
 
     #-- also create a standard plot for demonstration:
     crGraphs.createLinePlot(data, "Population fitness", xTickLabels_=xTickLabels, xLabel_="Generation", yLabel_="Fitness", yMin_=yMinStandardPlot, yMax_=yMaxStandardPlot,
-                            showBoxPlots_=True, lineWidth_=2, filePath_=filePathStandardPlot);
+                            showBoxPlots_=True, filePath_=filePathStandardPlot);
 
 if __name__ == "__main__":
 
