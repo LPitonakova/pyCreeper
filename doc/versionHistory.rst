@@ -6,7 +6,7 @@ Version history
 2.0 (NEW!)
 ----------------------------
 
-* **Properly encapsulated plot styles!** :ref:`Advanced: Using styles`
+* **Properly encapsulated plot styles!** :ref:`Tutorial: Using styles`
 * **Reading text files into 2D arrays** with a new module :mod:`pyCreeper.crFiles`
 * New functions in :mod:`pyCreeper.crData`:
     * Add and remove unique list elements with :func:`pyCreeper.crData.addUniqueElementToList` and :func:`pyCreeper.crData.removeElementFromList`
@@ -19,7 +19,7 @@ Version history
 1.1
 ----------------------------
 
-* :ref:`Advanced: Broken line plots`
+* :ref:`Tutorial: Broken line plots`
 * New functions in :mod:`pyCreeper.crData`:
     * Compress a list into a shorter lists: :func:`pyCreeper.crData.compressList`
     * Flip columns and rows of 2D arrays: :func:`pyCreeper.crData.getListByFlippingColumnsAndRows`

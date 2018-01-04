@@ -7,4 +7,4 @@ bin/
 *.pyc
 .pydevproject
 *.idea
-
+deployDoc.sh

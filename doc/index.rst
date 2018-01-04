@@ -29,8 +29,8 @@ The main purpose of pyCreeper is to wrap tens of lines of python code, required 
 Newest additions
 --------------------
 
-* **Properly encapsulated plot styles!** :ref:`Advanced: Using styles`
-* :ref:`Advanced: Broken line plots`
+* **Properly encapsulated plot styles!** :ref:`Tutorial: Using styles`
+* :ref:`Tutorial: Broken line plots`
 * New functions in :mod:`pyCreeper.crData`:
     * Compress a list into a shorter lists: :func:`pyCreeper.crData.compressList`
     * Flip columns and rows of 2D arrays: :func:`pyCreeper.crData.getListByFlippingColumnsAndRows`
@@ -48,8 +48,8 @@ Contents
     download
     supportedGraphs
     examples
-    advanced_usingStyles
-    advanced_brokenLinePlots
+    tutorial_usingStyles
+    tutorial_brokenLinePlots
     api
     versionHistory
 

@@ -1,5 +1,5 @@
 ===================================================
-Advanced: Broken line plots
+Tutorial: Broken line plots
 ===================================================
 
 Broken line plots are very useful when it comes to displaying data sets where some part of data spans a range that is very different from the rest of the data set. For example, consider the following figure:

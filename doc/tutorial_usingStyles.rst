@@ -1,5 +1,5 @@
 ===================================================
-Advanced: Using styles
+Tutorial: Using styles
 ===================================================
 
 Styles a way of specifying how plots created by :mod:`pyCreeper.crGraphs` should look like. Styles are encapsulated in a :mod:`pyCreeper.crGraphStyle.crGraphStyle` object and the object's properties may be set to change different settings.
