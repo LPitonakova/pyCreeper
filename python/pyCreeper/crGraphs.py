@@ -750,24 +750,23 @@ def replaceInvalidWithDefaultValue(value_, defaultValue_):
 
 def setFigureAxisLimits(ax_, minDataValue_, maxDataValue_, xMin_=INVALID_VALUE, xMax_=INVALID_VALUE, yMin_=INVALID_VALUE, yMax_=INVALID_VALUE, yTicksStep_ = 0, yTicksStepMultiplier_ = 1):
 
-    #-- recursively find the correct yTickStep based on the max value. The yTickStep should fit N times into maxDataValue_.
-    #   then annotate the y axis.
-    if (yTicksStep_ <= 0):
-        yTicksStep_ = 0.00001;
-        stop = False;
-        while (stop == False):
-            if (maxDataValue_ / yTicksStep_ <= 20):
-                stop = True;
-            else:
-                yTicksStep_ *= 10;
-
-    if (yTicksStep_ >= 1):
-        yTicksStep_ = (int)(yTicksStep_);
-
     #-- determine the y span of data
     dataRange = maxDataValue_ - minDataValue_;
     plotYMin = minDataValue_ - dataRange*0.1;
     plotYMax = maxDataValue_ + dataRange*0.1;
+
+    #-- recursively find the correct yTickStep based on the max value. The yTickStep should fit N times into maxDataValue_.
+    #   then annotate the y axis.
+    N = 20;
+    if (yTicksStep_ <= 0):
+        yTicksStep_ = 0.00001;
+        stop = False;
+        while (stop == False):
+            if (maxDataValue_ / yTicksStep_ <= N):
+                stop = True;
+            else:
+                yTicksStep_ *= 10;
+
 
     #-- round to the closest multiply of N, where N fits yTickStep
     plotYMin = plotYMin - (plotYMin%yTicksStep_);
@@ -780,7 +779,23 @@ def setFigureAxisLimits(ax_, minDataValue_, maxDataValue_, xMin_=INVALID_VALUE, 
     if (yMax_ != INVALID_VALUE):
         plotYMax = yMax_;
 
-    ax_.set_ylim(plotYMin, plotYMax);
+
+    #-- further adjust yTickStep in case more than M ticks would have to be shown
+    M = 10;
+    hasLotOfHorizontalTicks = False;
+    if (plotYMin + M*yTicksStep_ <= plotYMax):
+        hasLotOfHorizontalTicks = True;
+
+    #-- if only major grid should be shown, remove each second yTick in cases when a lot of yTicks would be present
+    if (getStyle().gridType == crGraphStyle.GRID_TYPE.MAJOR or getStyle().gridType == crGraphStyle.GRID_TYPE.MAJOR_HORIZONTAL):
+        yTicksStep_ *= 2;
+
+    #-- make integers look like whole numbers
+    if (yTicksStep_ >= 1):
+        yTicksStep_ = (int)(yTicksStep_);
+
+    #-- set the limit so that min / max values have some padding from the plot sides
+    ax_.set_ylim(plotYMin - plotYMax*0.05, plotYMax+plotYMax*0.05);
 
     ticks = [];
     ticksLabels = [];
@@ -809,6 +824,10 @@ def setFigureAxisLimits(ax_, minDataValue_, maxDataValue_, xMin_=INVALID_VALUE, 
             ticksLabels.append(intVal);
         else:
             ticksLabels.append(ticks[t]);
+
+        if (hasLotOfHorizontalTicks and (getStyle().gridType == crGraphStyle.GRID_TYPE.FULL or getStyle().gridType == crGraphStyle.GRID_TYPE.HORIZONTAL)):
+            if (t%2 == 1):
+                ticksLabels[t] = "";
 
     ax_.set_yticklabels(ticksLabels);
 
