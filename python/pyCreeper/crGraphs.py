@@ -755,6 +755,7 @@ def setFigureAxisLimits(ax_, minDataValue_, maxDataValue_, xMin_=INVALID_VALUE, 
     plotYMin = minDataValue_ - dataRange*0.1;
     plotYMax = maxDataValue_ + dataRange*0.1;
 
+
     #-- recursively find the correct yTickStep based on the max value. The yTickStep should fit N times into maxDataValue_.
     #   then annotate the y axis.
     N = 20;
@@ -762,11 +763,10 @@ def setFigureAxisLimits(ax_, minDataValue_, maxDataValue_, xMin_=INVALID_VALUE, 
         yTicksStep_ = 0.00001;
         stop = False;
         while (stop == False):
-            if (maxDataValue_ / yTicksStep_ <= N):
+            if (dataRange / yTicksStep_ <= N):
                 stop = True;
             else:
                 yTicksStep_ *= 10;
-
 
     #-- round to the closest multiply of N, where N fits yTickStep
     plotYMin = plotYMin - (plotYMin%yTicksStep_);
@@ -787,7 +787,7 @@ def setFigureAxisLimits(ax_, minDataValue_, maxDataValue_, xMin_=INVALID_VALUE, 
         hasLotOfHorizontalTicks = True;
 
     #-- if only major grid should be shown, remove each second yTick in cases when a lot of yTicks would be present
-    if (getStyle().gridType == crGraphStyle.GRID_TYPE.MAJOR or getStyle().gridType == crGraphStyle.GRID_TYPE.MAJOR_HORIZONTAL):
+    if (hasLotOfHorizontalTicks) and (getStyle().gridType == crGraphStyle.GRID_TYPE.MAJOR or getStyle().gridType == crGraphStyle.GRID_TYPE.MAJOR_HORIZONTAL):
         yTicksStep_ *= 2;
 
     #-- make integers look like whole numbers
