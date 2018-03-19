@@ -218,7 +218,7 @@ def createLinePlot(data_,
 
     xTickLabels = xTickLabels_.copy();
     if (len(xTickLabels) == 0):
-        xTickLabels = range(len(data_[0]));
+        xTickLabels = list(range(len(data_[0])));
 
     crHelpers.checkListsHaveTheSameLength(data_[0], xTickLabels);
 
@@ -273,7 +273,7 @@ def createLinePlot(data_,
         xTickData = xTickLabels;
     else:
         #-- xTickLabels are strings, the xTickData must be an array from 0-length of xTickLabels
-        xTickData = range(len(xTickLabels));
+        xTickData = list(range(len(xTickLabels)));
 
 
     #-- prepare box plot width
@@ -778,7 +778,6 @@ def setFigureAxisLimits(ax_, minDataValue_, maxDataValue_, xMin_=INVALID_VALUE, 
         plotYMin = yMin_;
     if (yMax_ != INVALID_VALUE):
         plotYMax = yMax_;
-
 
     #-- further adjust yTickStep in case more than M ticks would have to be shown
     M = 10;
