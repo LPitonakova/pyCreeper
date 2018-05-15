@@ -626,8 +626,6 @@ def createPieChart(data_=[], itemLabels_=[],
 
     #-- create the graph
     size = getStyle().figureSize;
-    if (renderFigure_):
-        size = (getStyle().figureSize[1]+1, getStyle().figureSize[1])
     fig, ax = createFigure(size, title_, figure_, subPlot_);
     ax.set_aspect(1)
 
@@ -640,6 +638,7 @@ def createPieChart(data_=[], itemLabels_=[],
     proptease.set_size(valuesFontSize_);
     plt.setp(autotexts, fontproperties=proptease);
 
+   
     #-- display / print, return:
     renderFigure(filePath_, renderFigure_);
     return fig;
