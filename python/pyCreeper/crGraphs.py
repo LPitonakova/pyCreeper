@@ -163,7 +163,7 @@ def createBarChart(data_,
 #--------------------------------------------------------------------------------------------------------- Line plot
 
 def createLinePlot(data_,
-                title_="", xLabel_ = "", yLabel_ = "", xTickLabels_=[], legendLabels_ = [],
+                title_="", xLabel_ = "", yLabel_ = "", xTickLabels_=[], xTickLabelPositions_=[], legendLabels_ = [],
                 showBoxPlots_=False, boxPlotWidth_=-1, showConfidenceIntervals_=False, showAverages_=False, doWilcoxon_=False,
                 xMin_=INVALID_VALUE, xMax_=INVALID_VALUE, xAxisGroupSize_ = 0, yMin_=INVALID_VALUE, yMax_=INVALID_VALUE, yTicksStep_ = 0, yTicksStepMultiplier_ = 1,
                 useBoxPlotPadding_ = False,
@@ -187,7 +187,8 @@ def createLinePlot(data_,
     :param `title_`: (optional, default = "") The figure title
     :param `xLabel_`: (optional, default = "") Label of the x-axis
     :param `yLabel_`: (optional, default = "") Label of the y-axis
-    :param `xTickLabels_`: (optional, default = []) A 1D list of tick labels for the x-axis. Must be the same length as the 1st dimension of `data_`, i.e., each data point must have a corresponding `xTickLabel`
+    :param `xTickLabels_`: (optional, default = []) A 1D list or numpy.array of tick labels for the x-axis. Make this a numpy.array when there are too many data points and x-axis values can be shown as numbers.
+    :param `xTickLabelPositions_`: (optional, default numpy.array()) A 1D list of positions on x-axis where ticks should be shown. Can be used e.g. when there are too many data points than `xTickLabels` and `xTickLabels` needs to show string values.
     :param `legendLabels_`: (optional, default = []) A 1D list of labels for the individual plot lines. Must be the same length as the 0th dimension of `data_`, i.e., each plot line must have a corresponding `legendLabel`
     :param `showBoxPlots_`: (optional, default = False) A boolean that specified whether to show box plots around data points. If True, `data_` must be a 3D list
     :param `boxPlotWidth_`: (optional, default = -1) A float that specified width of each box plot. If -1, box plot width is calculated automatically
@@ -269,7 +270,7 @@ def createLinePlot(data_,
     if (type(xTickLabels) == int):
         #-- xTickLabels are numbers, ok to use for plotting
         xTickData = xTickLabels;
-    elif (isinstance(xTickLabels, numpy.ndarray)):
+    elif (isinstance(xTickLabels, numpy.ndarray) or len(xTickLabelPositions_) > 0):
         #-- xTickLabels is a numpy array, data is simply a list with length of the main data dimension
         xTickData = list(range(len(data_[0])));
     else:
@@ -311,11 +312,17 @@ def createLinePlot(data_,
             lineStyle = '';
 
         #-- apply custom x tick labels
-        if (len(xTickLabels) > 0): #
+        if (len(xTickLabelPositions_) > 0):
+           ax.set_xticks(xTickLabelPositions_);
+           print("1")
+           ax.set_xticklabels(xTickLabels);
+        elif (len(xTickLabels) > 0): #
             if (isinstance(xTickLabels, numpy.ndarray)):
                ax.set_xticks(xTickLabels)
+               print("2")
             else:
                plt.xticks(xTickData, xTickLabels);
+               print("3")
             
 
         #-- find out how many line segments
