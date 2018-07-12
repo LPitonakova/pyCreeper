@@ -164,7 +164,7 @@ def createBarChart(data_,
 
 def createLinePlot(data_,
                 title_="", xLabel_ = "", yLabel_ = "", xTickLabels_=[], xTickLabelPositions_=[], legendLabels_ = [],
-                showBoxPlots_=False, boxPlotWidth_=-1, showConfidenceIntervals_=False, showAverages_=False, doWilcoxon_=False,
+                showBoxPlots_=False, boxPlotWidth_=-1, showConfidenceIntervals_=False, showAverages_=False, averagesIgnoreZeros_=False, doWilcoxon_=False,
                 xMin_=INVALID_VALUE, xMax_=INVALID_VALUE, xAxisGroupSize_ = 0, yMin_=INVALID_VALUE, yMax_=INVALID_VALUE, yTicksStep_ = 0, yTicksStepMultiplier_ = 1,
                 useBoxPlotPadding_ = False,
                 filePath_ = "", renderFigure_=True, figure_=None, subPlot_=111):
@@ -194,6 +194,7 @@ def createLinePlot(data_,
     :param `boxPlotWidth_`: (optional, default = -1) A float that specified width of each box plot. If -1, box plot width is calculated automatically
     :param `showConfidenceIntervals_`: (optional, default = False) A boolean that specified whether to error bars around data points. If True, `data_` must be a 3D list
     :param `showAverages_`: (optional, default = False) A boolean that specifies whether to show averages instead of medians as data points. If True, `data_` must be a 3D list
+    :param `averagesIgnoreZeros_`: (optional, default = False) If true, only non-zero values are considered when calculating the averages
     :param `doWilcoxon_`: (optional, default = False) A boolean that specified whether to perform `Wilcoxon signed-rank test <http://en.wikipedia.org/wiki/Wilcoxon_signed-rank_test>`_ between 2 plot lines. If True, the \* notation is used next to a tick label on the x-axis where there is significant difference with p=0.05. The \*\* notation is used when there is a significant different with p=0.01. This test can only be performed when `data_` has length of 2 and is a 3D list, i.e., if it containts data for 2 plot lines and each data point represents a list of values
     :param `xMin_`: (optional, default = `INVALID_VALUE`) Minimum value shown on the x-axis. If set to `INVALID_VALUE`, x-axis is displayed to fit the data
     :param `xMax_`: (optional, default = `INVALID_VALUE`) Maximum value shown on the x-axis. If set to `INVALID_VALUE`, x-axis is displayed to fit the data
@@ -339,7 +340,7 @@ def createLinePlot(data_,
             dataPoints = [];
             for q in range(len(data_[i])):
                 if (showAverages_):
-                    dataPoints.append(numpy.mean(data_[i][q]));
+                    dataPoints.append(crData.getAverageOfAList(data_[i][q], averagesIgnoreZeros_));
                 else:
                     dataPoints.append(numpy.median(data_[i][q]));
                 if (doWilcoxon_ and i == 1):
