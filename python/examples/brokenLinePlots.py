@@ -1,6 +1,6 @@
 from numpy import random;
-from python.pyCreeper import crGraphs;
-from python.pyCreeper import crGraphStyle;
+from pyCreeper import crGraphs;
+from pyCreeper import crGraphStyle;
 
 crGraphs.BASE_FILE_PATH = "../../exampleOutput/";
 

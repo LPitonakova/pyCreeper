@@ -1,5 +1,5 @@
-from python.pyCreeper import crGraphs;
-from python.pyCreeper import crGraphStyle;
+from pyCreeper import crGraphs;
+from pyCreeper import crGraphStyle;
 
 from matplotlib import pyplot;
 

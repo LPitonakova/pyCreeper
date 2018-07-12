@@ -1,5 +1,5 @@
 from numpy import random;
-from python.pyCreeper import crGraphs;
+from pyCreeper import crGraphs;
 crGraphs.BASE_FILE_PATH = "../../exampleOutput/";
 
 

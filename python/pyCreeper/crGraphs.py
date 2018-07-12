@@ -220,8 +220,6 @@ def createLinePlot(data_,
     if (len(xTickLabels) == 0):
         xTickLabels = list(range(len(data_[0])));
 
-    crHelpers.checkListsHaveTheSameLength(data_[0], xTickLabels);
-
     if (len(legendLabels_) > 0):
         crHelpers.checkListsHaveTheSameLength(data_, legendLabels_);
 
@@ -271,11 +269,13 @@ def createLinePlot(data_,
     if (type(xTickLabels) == int):
         #-- xTickLabels are numbers, ok to use for plotting
         xTickData = xTickLabels;
+    elif (isinstance(xTickLabels, numpy.ndarray)):
+        #-- xTickLabels is a numpy array, data is simply a list with length of the main data dimension
+        xTickData = list(range(len(data_[0])));
     else:
         #-- xTickLabels are strings, the xTickData must be an array from 0-length of xTickLabels
-        xTickData = list(range(len(xTickLabels)));
-
-
+        xTickData = list(range(len(xTickLabels)));   
+    
     #-- prepare box plot width
     if ((showBoxPlots_ and boxPlotWidth_ <= 0) or showConfidenceIntervals_ or useBoxPlotPadding_):
         boxPlotWidth_ = abs(xTickData[-1] - xTickData[0]) / 20.0;
@@ -311,8 +311,12 @@ def createLinePlot(data_,
             lineStyle = '';
 
         #-- apply custom x tick labels
-        if (len(xTickLabels) > 0):
-            plt.xticks(xTickData, xTickLabels);
+        if (len(xTickLabels) > 0): #
+            if (isinstance(xTickLabels, numpy.ndarray)):
+               ax.set_xticks(xTickLabels)
+            else:
+               plt.xticks(xTickData, xTickLabels);
+            
 
         #-- find out how many line segments
         numOfSegments = 0;
@@ -612,10 +616,10 @@ def createPieChart(data_=[], itemLabels_=[],
         if (styleColorIndex == (len(styleColors))):
             styleColorIndex = 0;
     #--
-
+    
     def formatPieceNumber(val_):
         if (showActualVals_ and showPercentageVals_):
-            val=int(val_*sum(data_)/100.0)
+            val = int(val_/100.*numpy.sum(data_))
             return '{p:.1f}% ({v:d})'.format(p=val_,v=val);
         if (showActualVals_):
             val=int(val_*sum(data_)/100.0)
@@ -629,7 +633,7 @@ def createPieChart(data_=[], itemLabels_=[],
     fig, ax = createFigure(size, title_, figure_, subPlot_);
     ax.set_aspect(1)
 
-    patches, texts, autotexts = ax.pie(data_, labels=itemLabels_, labeldistance=1.2, autopct=formatPieceNumber, shadow=showShadow_, colors=itemColors);
+    patches, texts, autotexts = ax.pie(data_, labels=itemLabels_, labeldistance=1.2, autopct=lambda val:formatPieceNumber(val), shadow=showShadow_, colors=itemColors);
 
     #-- setup fonts
     proptease = fm.FontProperties();
@@ -751,6 +755,8 @@ def setFigureAxisLimits(ax_, minDataValue_, maxDataValue_, xMin_=INVALID_VALUE, 
 
     #-- determine the y span of data
     dataRange = maxDataValue_ - minDataValue_;
+    if (dataRange == 0):
+       dataRange = 1;
     plotYMin = minDataValue_ - dataRange*0.1;
     plotYMax = maxDataValue_ + dataRange*0.1;
 
