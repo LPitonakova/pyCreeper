@@ -37,7 +37,7 @@ from . import crGraphStyle;
 
 #-- constants
 SHOW_OUTPUT = True;
-BASE_FILE_PATH = "./";
+BASE_FILE_PATH = "";
 DPI = 100;
 
 INVALID_VALUE = -999999;
@@ -314,15 +314,12 @@ def createLinePlot(data_,
         #-- apply custom x tick labels
         if (len(xTickLabelPositions_) > 0):
            ax.set_xticks(xTickLabelPositions_);
-           print("1")
            ax.set_xticklabels(xTickLabels);
         elif (len(xTickLabels) > 0): #
             if (isinstance(xTickLabels, numpy.ndarray)):
                ax.set_xticks(xTickLabels)
-               print("2")
             else:
                plt.xticks(xTickData, xTickLabels);
-               print("3")
             
 
         #-- find out how many line segments
