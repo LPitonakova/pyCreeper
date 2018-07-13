@@ -18,10 +18,9 @@ sudo port install py34-matplotlib
 INCLUDING pyCreeper IN YOUR PROJECT
 ======================================
 
-Include the following directory in your interpreter path:
+Include the following directory in your python path, e.g. in ~/.profile:
 
-/DIRECTORY_WHERE_DOWNLOADED/pyCreeper-master/python
-
+export PYTHONPATH="${PYTHONPATH}:/DIRECTORY_WHERE_DOWNLOADED/pyCreeper-master/python"
 
 
 You can then use pyCreeper in your code as
