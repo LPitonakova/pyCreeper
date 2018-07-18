@@ -157,7 +157,7 @@ def createBarChart(data_,
 
 
     #-- display / print, return:
-    renderFigure(filePath_, renderFigure_);
+    renderFigure(fig, filePath_, renderFigure_);
     return fig;
 
 #--------------------------------------------------------------------------------------------------------- Line plot
@@ -450,7 +450,7 @@ def createLinePlot(data_,
             t.set_fontsize(legendFontSize_);
 
     #-- display / print, return:
-    renderFigure(filePath_, renderFigure_);
+    renderFigure(fig, filePath_, renderFigure_);
     return fig;
 
 
@@ -561,7 +561,7 @@ def createMatrixPlot(data_=[[],[]],
                     ax.annotate(str(annotationValues_[y][x]) + annotationStringAfter_, xy=(gridStartX+x*gridStepX+gridStepX/2, gridStartY+y*gridStepY+gridStepY/2), size=tickFontSize_,  xycoords='axes fraction',horizontalalignment='center', verticalalignment='center')
 
     #-- display / print, return:
-    renderFigure(filePath_, renderFigure_);
+    renderFigure(fig, filePath_, renderFigure_);
     return fig;
 
 #--------------------------------------------------------------------------------------------------------- Pie chart
@@ -649,7 +649,7 @@ def createPieChart(data_=[], itemLabels_=[],
 
    
     #-- display / print, return:
-    renderFigure(filePath_, renderFigure_);
+    renderFigure(fig, filePath_, renderFigure_);
     return fig;
 
 
@@ -657,7 +657,7 @@ def createPieChart(data_=[], itemLabels_=[],
 #============================== HELPER FUNCTIONS ============================
 #============================================================================
 
-def renderFigure(filePath_="", renderFigure_=True):
+def renderFigure(figure_, filePath_="", renderFigure_=True):
     """
     A helper function that performs the current pylab's figure rendering into a file or on screen
 
@@ -674,6 +674,8 @@ def renderFigure(filePath_="", renderFigure_=True):
 
             #--
             pylab.savefig(filePath_, format='png')
+            pylab.close(figure_)
+
             if (SHOW_OUTPUT == True):
                 print("[crData] Saved " + filePath_);
         else:
