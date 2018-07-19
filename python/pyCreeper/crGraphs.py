@@ -814,7 +814,6 @@ def setFigureAxisLimits(ax_, minDataValue_, maxDataValue_, xMin_=INVALID_VALUE, 
 
     if (yMin_ == - yMax_*0.05):
         start = 0;
-
     ticks = numpy.arange(start, stop + yTicksStep_, yTicksStep_);
     ax_.set_yticks(ticks);
 
@@ -832,7 +831,7 @@ def setFigureAxisLimits(ax_, minDataValue_, maxDataValue_, xMin_=INVALID_VALUE, 
         elif (yTicksStep_ >= 1):
             ticksLabels.append(intVal);
         else:
-            ticksLabels.append(ticks[t]);
+            ticksLabels.append( ((int)(ticks[t]*(1.0/yTicksStep_))) / (1.0/yTicksStep_) ); # assuring to weird trailing .000001 are shown
 
         if (hasLotOfHorizontalTicks and (getStyle().gridType == crGraphStyle.GRID_TYPE.FULL or getStyle().gridType == crGraphStyle.GRID_TYPE.HORIZONTAL)):
             if (t%2 == 1):
