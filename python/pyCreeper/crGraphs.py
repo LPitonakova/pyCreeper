@@ -351,11 +351,19 @@ def createLinePlot(data_,
                     elif (pVal < 0.05):
                         xTickLabels[q] = str(xTickLabels[q]) + "\n*";
 
-                for r in range(len(data_[i][q])):
-                    if (data_[i][q][r] > maxVal):
-                        maxVal = data_[i][q][r];
-                    if (data_[i][q][r] < minVal):
-                        minVal = data_[i][q][r]
+                #-- find data min/max
+                if (showAverages_ and not showConfidenceIntervals_):
+                    #-- averages will need a different scale than when showing confidence intervals or box plots because they don't show all data
+                    if (dataPoints[q] > maxVal):
+                        maxVal = dataPoints[q];
+                    if (dataPoints[q] < minVal):
+                        minVal = dataPoints[q]
+                else:
+                    for r in range(len(data_[i][q])):
+                        if (data_[i][q][r] > maxVal):
+                            maxVal = data_[i][q][r];
+                        if (data_[i][q][r] < minVal):
+                            minVal = data_[i][q][r]
 
             if (showConfidenceIntervals_):
                 dataDof = [(len(data_[i][q])-1) for q in range(len(dataPoints))]; #degrees of freedom is sample size -1
