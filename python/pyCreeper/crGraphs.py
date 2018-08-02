@@ -241,7 +241,7 @@ def createLinePlot(data_,
 
     if (showAverages_):
         showBoxPlots_ = False;
-        showConfidenceIntervals_ = False;
+
 
     if (doWilcoxon_):
         if (len(data_) != 2):
@@ -770,6 +770,9 @@ def setFigureAxisLimits(ax_, minDataValue_, maxDataValue_, xMin_=INVALID_VALUE, 
 
     #-- determine the y span of data
     dataRange = maxDataValue_ - minDataValue_;
+    if (yMax_ != INVALID_VALUE and yMin_ != INVALID_VALUE):
+        dataRange = yMax_ - yMin_;
+
     if (dataRange == 0):
        dataRange = 1;
     plotYMin = minDataValue_ - dataRange*0.1;
