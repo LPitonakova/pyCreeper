@@ -51,6 +51,19 @@ def checkListsHaveTheSameLength(list1_, list2_):
     if (len(list1_) != len(list2_)):
         raise ValueError("The " + list1Name + " and " + list2Name + " must have the same length. Length of " + list1Name + " is " + str(len(list1_)) + ". Length of " + list2Name + " is " + str(len(list2_)) + ".");
 
+def checkListHasAtLeastLengthOfList(list1_, list2_):
+    """
+    Raises a ValueError if list 1 is shorter than list 2.
+
+    :param `list1_`: List 1
+    :param `list2_`: List 2 to compare length of ``list1_`` to
+    """
+    list1Name = getVariableNamePassedAsParameter();
+    list2Name = getVariableNamePassedAsParameter(2);
+    if (len(list1_) < len(list2_)):
+        raise ValueError(list1Name + " must have at least length of " + list2Name + ". Length of " + list1Name + " is " + str(len(list1_)) + ". Length of " + list2Name + " is " + str(len(list2_)) + ".");
+
+
 def checkVariableDataType(variable_, expectedDataType_):
     """
     Check if a variable has a specified data type. If not, raises a TypeError.

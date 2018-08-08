@@ -69,7 +69,7 @@ def createBarChart(data_,
     crHelpers.checkListsHaveTheSameLength(data_[0], xTickLabels_);
 
     if (len(legendLabels_) > 0):
-        crHelpers.checkListsHaveTheSameLength(data_, legendLabels_);
+        crHelpers.checkListHasAtLeastLengthOfList(legendLabels_, data_);
 
 
     titleFontSize_ = replaceInvalidWithDefaultValue(titleFontSize_, TITLE_FONT_SIZE)
@@ -223,7 +223,7 @@ def createLinePlot(data_,
         xTickLabels = list(range(len(data_[0])));
 
     if (len(legendLabels_) > 0):
-        crHelpers.checkListsHaveTheSameLength(data_, legendLabels_);
+        crHelpers.checkListHasAtLeastLengthOfList(legendLabels_, data_);
 
     #-- apply styles
     legendFontSize_ = getStyle().legendFontSize;
@@ -609,7 +609,8 @@ def createPieChart(data_=[], itemLabels_=[],
     #-- test and pre-set data
     crHelpers.checkVariableIsList(data_,1,True);
     crHelpers.checkVariableIsList(itemLabels_,True);
-    crHelpers.checkListsHaveTheSameLength(data_, itemLabels_);
+    crHelpers.checkListHasAtLeastLengthOfList(itemLabels_, data_);
+
 
     #-- set styles
     itemsFontSize_ = getStyle().labelFontSize;
