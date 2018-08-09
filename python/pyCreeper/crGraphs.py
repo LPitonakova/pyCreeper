@@ -146,7 +146,7 @@ def createBarChart(data_,
         legendItems = [];
         for g in range(len(plots)):
             legendItems.append(plots[g][0]);
-        legend = ax.legend(flip(legendItems, numOfLegendColumns_), flip(legendLabels_,numOfLegendColumns_),loc=legendPosition_.value, ncol=numOfLegendColumns_)
+        legend = ax.legend(flip(legendItems, numOfLegendColumns_), flip(legendLabels_,numOfLegendColumns_),loc=legendPosition_.value, ncol=numOfLegendColumns_, fancybox=True, framealpha=0.7)
         for t in legend.get_texts():
             if (type(legendFontSize_) == str):
                 t.set_fontsize(legendFontSize_)
@@ -453,7 +453,7 @@ def createLinePlot(data_,
         legendItems = [];
         for g in range(len(plots)):
             legendItems.append(plots[g][0]);
-        legend = ax.legend(flip(legendItems, numOfLegendColumns_), flip(legendLabels_,numOfLegendColumns_),loc=legendPosition_.value, ncol=numOfLegendColumns_)
+        legend = ax.legend(flip(legendItems, numOfLegendColumns_), flip(legendLabels_,numOfLegendColumns_),loc=legendPosition_.value, ncol=numOfLegendColumns_, fancybox=True, framealpha=0.7)
         for t in legend.get_texts():
             t.set_fontsize(legendFontSize_);
 
