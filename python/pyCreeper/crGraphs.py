@@ -163,7 +163,7 @@ def createBarChart(data_,
 #--------------------------------------------------------------------------------------------------------- Line plot
 
 def createLinePlot(data_,
-                title_="", xLabel_ = "", yLabel_ = "", xTickLabels_=[], xTickLabelPositions_=[], legendLabels_ = [],
+                title_="", xLabel_ = "", yLabel_ = "", xTickLabels_=[], xTickLabelPositions_=[], legendTitle_ = "", legendLabels_ = [],
                 showBoxPlots_=False, boxPlotWidth_=-1, showConfidenceIntervals_=False, showAverages_=False, averagesIgnoreZeros_=False, doWilcoxon_=False,
                 xMin_=INVALID_VALUE, xMax_=INVALID_VALUE, xAxisGroupSize_ = 0, yMin_=INVALID_VALUE, yMax_=INVALID_VALUE, yTicksStep_ = 0, yTicksStepMultiplier_ = 1,
                 useBoxPlotPadding_ = False,
@@ -189,6 +189,7 @@ def createLinePlot(data_,
     :param `yLabel_`: (optional, default = "") Label of the y-axis
     :param `xTickLabels_`: (optional, default = []) A 1D list or numpy.array of tick labels for the x-axis. Make this a numpy.array when there are too many data points and x-axis values can be shown as numbers.
     :param `xTickLabelPositions_`: (optional, default numpy.array()) A 1D list of positions on x-axis where ticks should be shown. Can be used e.g. when there are too many data points than `xTickLabels` and `xTickLabels` needs to show string values.
+    :param `legendTitle_` : (optional, defalut = "") Text show before legend
     :param `legendLabels_`: (optional, default = []) A 1D list of labels for the individual plot lines. Must be the same length as the 0th dimension of `data_`, i.e., each plot line must have a corresponding `legendLabel`
     :param `showBoxPlots_`: (optional, default = False) A boolean that specified whether to show box plots around data points. If True, `data_` must be a 3D list
     :param `boxPlotWidth_`: (optional, default = -1) A float that specified width of each box plot. If -1, box plot width is calculated automatically
@@ -453,9 +454,11 @@ def createLinePlot(data_,
         legendItems = [];
         for g in range(len(plots)):
             legendItems.append(plots[g][0]);
-        legend = ax.legend(flip(legendItems, numOfLegendColumns_), flip(legendLabels_,numOfLegendColumns_),loc=legendPosition_.value, ncol=numOfLegendColumns_, fancybox=True, framealpha=0.7)
+        legend = ax.legend(flip(legendItems, numOfLegendColumns_), flip(legendLabels_,numOfLegendColumns_),loc=legendPosition_.value, ncol=numOfLegendColumns_, title=legendTitle_, fancybox=True, framealpha=0.7)
         for t in legend.get_texts():
             t.set_fontsize(legendFontSize_);
+        legend.get_title().set_fontsize(legendFontSize_);
+        legend._legend_box.align = "left"
 
     #-- display / print, return:
     renderFigure(fig, filePath_, renderFigure_);
