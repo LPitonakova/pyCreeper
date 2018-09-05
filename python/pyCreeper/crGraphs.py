@@ -164,7 +164,7 @@ def createBarChart(data_,
 
 def createLinePlot(data_,
                 title_="", xLabel_ = "", yLabel_ = "", xTickLabels_=[], xTickLabelPositions_=[], legendTitle_ = "", legendLabels_ = [],
-                showBoxPlots_=False, boxPlotWidth_=-1, showConfidenceIntervals_=False, showAverages_=False, averagesIgnoreZeros_=False, doWilcoxon_=False,
+                showBoxPlots_=False, showConfidenceIntervals_=False, showAverages_=False, averagesIgnoreZeros_=False, doWilcoxon_=False,
                 xMin_=INVALID_VALUE, xMax_=INVALID_VALUE, xAxisGroupSize_ = 0, yMin_=INVALID_VALUE, yMax_=INVALID_VALUE, yTicksStep_ = 0, yTicksStepMultiplier_ = 1,
                 useBoxPlotPadding_ = False,
                 filePath_ = "", renderFigure_=True, figure_=None, subPlot_=111):
@@ -192,7 +192,6 @@ def createLinePlot(data_,
     :param `legendTitle_` : (optional, defalut = "") Text show before legend
     :param `legendLabels_`: (optional, default = []) A 1D list of labels for the individual plot lines. Must be the same length as the 0th dimension of `data_`, i.e., each plot line must have a corresponding `legendLabel`
     :param `showBoxPlots_`: (optional, default = False) A boolean that specified whether to show box plots around data points. If True, `data_` must be a 3D list
-    :param `boxPlotWidth_`: (optional, default = -1) A float that specified width of each box plot. If -1, box plot width is calculated automatically
     :param `showConfidenceIntervals_`: (optional, default = False) A boolean that specified whether to error bars around data points. If True, `data_` must be a 3D list
     :param `showAverages_`: (optional, default = False) A boolean that specifies whether to show averages instead of medians as data points. If True, `data_` must be a 3D list
     :param `averagesIgnoreZeros_`: (optional, default = False) If true, only non-zero values are considered when calculating the averages
@@ -237,6 +236,7 @@ def createLinePlot(data_,
     markers_ = getStyle().markers;
     colors_ = getStyle().colors;
     numOfLegendColumns_ = getStyle().numOfLegendColumns;
+    boxPlotWidth_ = getStyle().boxPlotWidth;
 
 
 
@@ -280,7 +280,7 @@ def createLinePlot(data_,
         xTickData = list(range(len(xTickLabels)));   
     
     #-- prepare box plot width
-    if ((showBoxPlots_ and boxPlotWidth_ <= 0) or showConfidenceIntervals_ or useBoxPlotPadding_):
+    if ((showBoxPlots_ and boxPlotWidth_ == INVALID_VALUE) or showConfidenceIntervals_ or useBoxPlotPadding_):
         boxPlotWidth_ = abs(xTickData[-1] - xTickData[0]) / 20.0;
 
 

@@ -56,6 +56,7 @@ class crGraphStyle:
     __colorMap = INVALID_VALUE;
     __lineWidth = INVALID_VALUE;
     __boxPlotLineWidth = INVALID_VALUE;
+    __boxPlotWidth = INVALID_VALUE;
     __markerSize = INVALID_VALUE;
     __lineStyles = INVALID_VALUE;
     __gridType = INVALID_VALUE;
@@ -86,6 +87,7 @@ class crGraphStyle:
         """
         self.lineWidth = 2;
         self.boxPlotLineWidth = 2;
+        self.boxPlotWidth = INVALID_VALUE;
         self.markerSize = 12;
         self.lineStyles = [];
         self.gridType = GRID_TYPE.FULL;
@@ -293,6 +295,17 @@ class crGraphStyle:
     def boxPlotLineWidth(self, value):
         crHelpers.checkVariableDataType(value, int);
         self.__boxPlotLineWidth = value
+
+    @property
+    def boxPlotWidth(self):
+        """
+        Box plot width. Default = `crGraphs.INVALID_VALUE` If equal to `crGraphs.INVALID_VALUE`, box plot width is calculated automatically.
+        """
+        return self.__boxPlotWidth;
+    @boxPlotWidth.setter
+    def boxPlotWidth(self, value):
+        crHelpers.checkVariableDataType(value, (int,float));
+        self.__boxPlotWidth = value
 
     @property
     def lineWidth(self):

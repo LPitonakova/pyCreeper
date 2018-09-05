@@ -77,6 +77,7 @@ def checkVariableDataType(variable_, expectedDataType_):
         if (not isinstance(variable_, expectedDataType_)):
             raise TypeError("The " + getVariableNamePassedAsParameter() + " parameter must be of data type " + str(expectedDataType_) + ". Got: " + str(type(variable_)));
 
+
 def checkVariableGreaterThanAnother(variable1_, variable2_):
     """
     Check if a variable is greater than another. If not, raises a TypeError.
