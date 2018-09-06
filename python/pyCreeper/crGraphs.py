@@ -139,7 +139,7 @@ def createBarChart(data_,
     #    legendItems.append(plots[g][0]);
 
     #-- show legend
-    if (len(legendLabels_) > 0):
+    if (len(legendLabels_) > 0 and legendPosition_ != crGraphStyle.LEGEND_POSITION.NONE):
         def flip(items, ncol):
             return itertools.chain(*[items[i::ncol] for i in range(ncol)])
 
@@ -447,7 +447,7 @@ def createLinePlot(data_,
     setFigureAxisLimits(ax, minVal, maxVal, xMin_, xMax_, yMin_, yMax_, yTicksStep_, yTicksStepMultiplier_);
 
     #-- show legend
-    if (len(legendLabels_) > 0):
+    if (len(legendLabels_) > 0 and legendPosition_ != crGraphStyle.LEGEND_POSITION.NONE):
         def flip(items, ncol):
             return itertools.chain(*[items[i::ncol] for i in range(ncol)])
 

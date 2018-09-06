@@ -18,6 +18,7 @@ class LEGEND_POSITION(Enum):
     LOWER_CENTER = "lower center"
     UPPER_CENTER = "upper center"
     CENTER = "center"
+    NONE = "none"
 
 @unique
 class GRID_TYPE(Enum):
