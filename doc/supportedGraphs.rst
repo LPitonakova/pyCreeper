@@ -3,6 +3,18 @@ Supported figure types
 ===================================================
 
 ----------------------------
+Bar plots
+----------------------------
+.. figure:: ../exampleOutput/barPlot_errorBars.png
+    :scale: 100%
+
+    Function :func:`pyCreeper.crGraphs.createBarPlot`
+
+    Code examples:
+    :func:`examples.barPlots.example1_simple`
+    :func:`examples.barPlots.example2_errorBars`
+
+----------------------------
 Box plots
 ----------------------------
 .. figure:: ../exampleOutput/linePlot_boxPlots.png

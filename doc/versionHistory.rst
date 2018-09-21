@@ -18,7 +18,19 @@ Version history
 ===================================================
 
 ----------------------------
-2.0 (NEW!)
+2.1 (NEW!)
+----------------------------
+
+* **New plot type: Bar plot** (see :ref:`Bar plot examples`)
+* **Bar and line plot legends can have optional titles** (see :func:`examples.barPlots.example2_errorBars`)
+* Box plot width can now be specified using the :func:`pyCreeper.crGraphStyle.boxPlotWidth` property
+* Plot legends are semi-transparent to allow seeing data points underneath
+* Better automatic detection of which x-axis tick to show
+
+* Plot range and size bug fixes
+
+----------------------------
+2.0
 ----------------------------
 
 * **Properly encapsulated plot styles!** :ref:`Tutorial: Using styles`

@@ -5,7 +5,7 @@
     :align: left
 
 ############################
-pyCreeper 2.0
+pyCreeper 2.1
 ############################
 
 **Welcome! pyCreeper is a python library that lets you create pretty graphs in python with one-line function calls.**
@@ -29,14 +29,10 @@ The main purpose of pyCreeper is to wrap tens of lines of python code, required 
 Newest additions
 --------------------
 
+* **New plot type: Bar plot** (see :ref:`Bar plot examples`)
+* **Bar and line plot legends can have optional titles** (see :func:`examples.barPlots.example2_errorBars`)
 * **Properly encapsulated plot styles!** :ref:`Tutorial: Using styles`
 * :ref:`Tutorial: Broken line plots`
-* New functions in :mod:`pyCreeper.crData`:
-    * Compress a list into a shorter lists: :func:`pyCreeper.crData.compressList`
-    * Flip columns and rows of 2D arrays: :func:`pyCreeper.crData.getListByFlippingColumnsAndRows`
-    * Get median of a list and optionally ignore 0-values: :func:`pyCreeper.crData.getMedianOfAList`
-
-* Better automatic detection of y-axis range y-ticks for plots
 
 
 Contents

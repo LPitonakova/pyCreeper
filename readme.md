@@ -3,16 +3,16 @@ INSTALLING DEPENDENCIES
 ======================================
 
 
-Make sure you have Python 3.4 installed, along with matplotlib, scipy and numpy. E.g., if you are using macports:
+Make sure you have Python 3.5 installed, along with matplotlib, scipy and numpy. E.g., if you are using macports:
 
 
-sudo port install python34
+sudo port install python35
 
-sudo port install py34-numpy
+sudo port install py35-numpy
 
-sudo port install py34-scipy
+sudo port install py35-scipy
 
-sudo port install py34-matplotlib
+sudo port install py35-matplotlib
 
 
 INCLUDING pyCreeper IN YOUR PROJECT
@@ -49,9 +49,9 @@ Documentation can be built using sphinx.
 
 E.g., if you are using macports:
 
-sudo port install py34-sphinx
+sudo port install py35-sphinx
 
-sudo port select --set sphinx py34-sphinx
+sudo port select --set sphinx py35-sphinx
 
 
 
@@ -61,11 +61,10 @@ Other examples on http://www.sphinx-doc.org/en/1.4.8/install.html
 2. Install the rtd theme via:
 ------------------------------------------------------
 
-sudo port install py34-sphinx_rtd_theme
+sudo port install py35-sphinx_rtd_theme
 
 
-
-(Make sure to install the 0.2.4 version if using the theme with Python 3.4!)
+(Make sure to install the 0.2.4 version)
 
 
 3. Build

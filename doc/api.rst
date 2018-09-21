@@ -8,6 +8,7 @@ The most useful functions
 
 Creating figures:
 
+* :func:`pyCreeper.crGraphs.createBarPlot`
 * :func:`pyCreeper.crGraphs.createLinePlot`
 * :func:`pyCreeper.crGraphs.createMatrixPlot`
 * :func:`pyCreeper.crGraphs.createPieChart`
