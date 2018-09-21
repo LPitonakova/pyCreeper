@@ -1,4 +1,7 @@
 
+**pyCreeper 2.1**
+
+
 INSTALLING DEPENDENCIES
 ======================================
 
@@ -44,7 +47,7 @@ BUILDING DOCUMENTATION
 
 Documentation can be built using sphinx.
 
-1. Make sure you have sphinx for Python 3.4 installed.
+1. Make sure you have sphinx for Python 3.5 installed.
 ------------------------------------------------------
 
 E.g., if you are using macports:
