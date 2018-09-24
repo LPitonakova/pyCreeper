@@ -33,24 +33,19 @@ def getNumberOfListDimensions(list_):
 
    while (stop == False):
       try:
-         listToCheck = listToCheck[dimension];
-         dimension += 1;
          #-- if this not a list, stop immediatelly
          if (type(listToCheck) != list):
             stop = True;
+         else:
+            #-- proceed to the next dimension
+            dimension += 1;
+            #print(type(listToCheck))
+            listToCheck = listToCheck[0];
 
 
       except:
          #print("Exception at dimension " + str(dimension));
          stop = True;
-         #-- check that the exception wasn't thrown because the list is empty at this dimension.
-         #   if that was the case, count that as a valid dimension
-         try:
-            length = len(listToCheck);
-            dimension += 1;
-         except:
-            pass
-            #print("Not an empty list at dimension " + str(dimension));
 
    return dimension;
 
