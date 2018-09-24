@@ -819,6 +819,10 @@ def setFigureAxisLimits(ax_, minDataValue_, maxDataValue_, xMin_=INVALID_VALUE, 
    dataRange = maxDataValue_ - minDataValue_;
    if (yMax_ != INVALID_VALUE and yMin_ != INVALID_VALUE):
       dataRange = yMax_ - yMin_;
+   elif (yMax_ != INVALID_VALUE):
+      dataRange = yMax_ - minDataValue_;
+   elif (yMin_ != INVALID_VALUE):
+      dataRange = maxDataValue_ - yMin_;
 
    if (dataRange == 0):
       dataRange = 1;
