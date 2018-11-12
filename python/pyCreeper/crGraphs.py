@@ -413,7 +413,7 @@ def createLinePlot(data_,
             segStart = seg * lineSegmentLength;
             segEnd = segStart + lineSegmentLength;
             if (segEnd > len(xTickData)):
-               segEnd = len(xTickData-1);
+               segEnd = len(xTickData) - 1;
             plot = pylab.plot(xTickData[segStart:segEnd], dataPoints[segStart:segEnd], marker, color=color, label = legendLabel, linewidth=lineWidth_, linestyle=lineStyle, markersize=markerSize_);
 
       else:
@@ -428,7 +428,7 @@ def createLinePlot(data_,
             segStart = seg * lineSegmentLength;
             segEnd = segStart + lineSegmentLength;
             if (segEnd > len(xTickData)):
-               segEnd = len(xTickData-1);
+               segEnd = len(xTickData) - 1;
 
             plot = pylab.plot(xTickData[segStart:segEnd], data_[i][segStart:segEnd], marker, color=color, label = legendLabel, linewidth=lineWidth_, linestyle=lineStyle, markersize=markerSize_);
 
