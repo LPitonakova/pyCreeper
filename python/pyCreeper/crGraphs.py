@@ -265,6 +265,9 @@ def createLinePlot(data_,
    if (len(xTickLabels) == 0):
       xTickLabels = list(range(len(data_[0])));
 
+   if (len(legendLabels_) > 0 and legendLabels_[0] == ""):
+      legendLabels_ = []
+
    if (len(legendLabels_) > 0):
       crHelpers.checkListHasAtLeastLengthOfList(legendLabels_, data_);
 
