@@ -291,3 +291,31 @@ def compressList(data_, timeBinLength_, useAverages_ = True, discardZerosFromAve
 
 
    return returnData;
+
+
+def flattenList(data_, multiplier_=1):
+   """
+   Put all elements of N-dimensional data_ into a single list
+   :param data_: The list
+   :param multiplier_: (optional, default = 1) Value by which to multiply each data value
+   :return: A flattened list
+   """
+
+   returnArray = []
+
+   def flattenDimension(data_, returnArray_, multiplier_):
+      """
+      Recursively flatten any dimensional data_ into 1D.
+      """
+      if (getNumberOfListDimensions(data_) == 2):
+         #-- last 2 dimensions, do the work
+         for list in data_:
+            returnArray_ += [item*multiplier_ for item in list]
+      else:
+         for list in data_:
+            flattenDimension(list, returnArray_, multiplier_);
+
+      return returnArray_;
+
+   flattenDimension(data_, returnArray, multiplier_);
+   return returnArray;
