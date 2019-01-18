@@ -833,17 +833,20 @@ def setFigureAxisLimits(ax_, minDataValue_, maxDataValue_, xMin_=INVALID_VALUE, 
    plotYMax = maxDataValue_ + dataRange*0.1;
 
 
-   #-- recursively find the correct yTickStep based on the max value. The yTickStep should fit N times into maxDataValue_.
+   #-- find the correct yTickStep based on the max value. The yTickStep should fit N times into maxDataValue_.
    #   then annotate the y axis.
-   N = 20;
+   N = 10;
+   allowedYTickSteps = []
+   for multiplier in [0.00001, 0.0001, 0.001, 0.01, 0.1, 1, 10, 100, 1000, 10000, 100000]:
+      for val in [1,2,5]:
+         allowedYTickSteps.append(val*multiplier);
+
    if (yTicksStep_ <= 0):
-      yTicksStep_ = 0.00001;
-      stop = False;
-      while (stop == False):
-         if (dataRange / yTicksStep_ <= N):
-            stop = True;
-         else:
-            yTicksStep_ *= 10;
+      for val in allowedYTickSteps:
+         if (dataRange / val <= N):
+            yTicksStep_ = val;
+            break;
+
 
    #-- round to the closest multiply of N, where N fits yTickStep
    plotYMin = plotYMin - (plotYMin%yTicksStep_);
