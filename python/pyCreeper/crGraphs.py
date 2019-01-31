@@ -383,9 +383,9 @@ def createLinePlot(data_,
                #-- do the Wilcoxon test on individual samples (that together form a median) and compare them to runs of previous data set:
                pVal = scipy.stats.wilcoxon(data_[i][q],data_[0][q])[1];
                if (pVal < 0.01):
-                  xTickLabels[q] = str(xTickLabels[q]) + "\n**";
+                  xTickLabels[q] = str(xTickLabels[q]) + "**";
                elif (pVal < 0.05):
-                  xTickLabels[q] = str(xTickLabels[q]) + "\n*";
+                  xTickLabels[q] = str(xTickLabels[q]) + "*";
 
             #-- find data min/max
             if (showAverages_ and not showConfidenceIntervals_):
@@ -462,6 +462,7 @@ def createLinePlot(data_,
             cap.set(linewidth=boxPlotLineWidth)
 
       #-- apply custom x tick labels
+
       if (len(xTickLabelPositions_) > 0):
          #-- based on user-defined positions and labels
          ax.set_xticks(xTickLabelPositions_);
@@ -473,6 +474,7 @@ def createLinePlot(data_,
          else:
             plt.xticks(xTickData, xTickLabels);
       else:
+         print("HERE");
          #-- automatic
          setTickLabels(ax,data_,xTickLabels_, 0.4);
 
