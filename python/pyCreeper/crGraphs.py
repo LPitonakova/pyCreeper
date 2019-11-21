@@ -187,7 +187,7 @@ def createBarPlot(data_,
    #-- show legend
    if (len(legendLabels_) > 0 and legendPosition_ != crGraphStyle.LEGEND_POSITION.NONE):
       def flip(items, ncol):
-         return itertools.chain(*[items[i::ncol] for i in range(ncol)])
+         return list(itertools.chain(*[items[i::ncol] for i in range(ncol)]))
 
       legendItems = [];
       for g in range(len(plots)):
@@ -497,7 +497,7 @@ def createLinePlot(data_,
    #-- show legend
    if (len(legendLabels_) > 0 and legendPosition_ != crGraphStyle.LEGEND_POSITION.NONE):
       def flip(items, ncol):
-         return itertools.chain(*[items[i::ncol] for i in range(ncol)])
+         return list(itertools.chain(*[items[i::ncol] for i in range(ncol)]))
 
       legendItems = [];
       for g in range(len(plots)):
